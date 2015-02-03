@@ -33,21 +33,6 @@ const string DefaultFile = "/home/chris/users.auth";
 const string DefaultNewFile = "/home/chris/users.auth.new";
 
 //----------------------------------------------------------------------------
-// Summary: Get the current login
-// Returns: current login ID
-string getUserName()
-{
-	char username[64] = {0};
-	int namelen = getlogin_r(username, sizeof(username) - 1);
-
-	if (namelen == 0) {
-		return username;
-	} else {
-		return "";
-	}
-}
-
-//----------------------------------------------------------------------------
 // Summary: Get a password/PIN from the terminal
 // Params:
 //     prompt - The prompt to display to the user
@@ -59,41 +44,31 @@ string getPassword(string prompt)
 }
 
 //----------------------------------------------------------------------------
-// Summary: Fetch a user's current PIN from the authorisation file
-// Params:
-//     user - The prompt to display to the user
-// Returns: PIN in the auth file, or empty string if user is not yet listed
-string getCurrentPin (string user)
+// Summary: Get a secret for a user
+// Params: none
+// Returns: The secret to use
+string getSecret()
 {
-	ifstream authFile(DefaultFile.c_str());
-	string type;
-	string userin;
-	string pin, temp;
-	
-	while (authFile >> type >> userin >> pin >> temp)
-	{
-		if (userin == user) {
-			if (pin.compare("-") == 0) {
-				return "";
-			} else {
-				return pin;
-			}
-
-			break;
-		}
-	}
-
 	return "";
 }
 
 //----------------------------------------------------------------------------
-// Summary: Update the PIN for the user in the auth file (or add the user if
-//	the login doesn't already exist
+// Summary: Convert the secret to a base32 string
+// Params: Secret to convert as a hex string
+// Returns: Base32 version of the secret
+string toBase32(string secret)
+{
+	return "";
+}
+
+//----------------------------------------------------------------------------
+// Summary: Add the user for OTP auth
 // Params:
 //     user   - User that we're adding/updating
 //     newpin - PIN for the user
+//     secret - Shared secret for the user
 // Returns: nothing
-void savePin (string user, string newpin)
+void savePin (string user, string newpin, string secret)
 {
 	ifstream authFile(DefaultFile.c_str());
 	ofstream newAuthFile(DefaultNewFile.c_str());
@@ -102,20 +77,18 @@ void savePin (string user, string newpin)
 	string pin, temp;
 	bool userwrote = false;
 	
-	while (authFile >> type >> userin >> pin >> temp)
+	while (authFile >> type >> userin >> temp)
 	{
 		if (userin != user) {
-			newAuthFile << type << " " << userin << " " << pin << " " << temp << endl;
+			newAuthFile << type << " " << userin << " " << temp << endl;
 		} else {
-			newAuthFile << type << " " << user << " " << newpin << " " << temp << endl;
+			newAuthFile << type << " " << user << " " << newpin << " " << secret << endl;
 			userwrote = true;
 		}
 	}
 
 	if (!userwrote) {
-		// We should never call this, but have it in just in case
-		// something happens (a race possibly?).
-		cerr << "Error - didn't update user " << user << ". User removed from OTP?" << endl;
+		newAuthFile << "HOTP/T30 " << user << " " << newpin << " " << secret << endl;
 	}
 }
 
@@ -127,33 +100,29 @@ void savePin (string user, string newpin)
 // Returns: program exit code
 int main(int argc, char **argv)
 {
-	string user = getUserName();
-
-	if (user == "") {
-		cout << "User not configured for OTP";
-		return 3;
-	}
-
-	ostringstream prompt;
-	prompt << "Enter existing PIN for " << user;
-	string password = getPassword(prompt.str());
-	string currentPin = getCurrentPin(user);
-
-	if (password != currentPin) {
-		cout << "Invalid PIN." << endl;
+	if (argc == 0) {
+		cout << "Syntax: otpadduser {user}" << endl;
 		return 1;
 	}
 
-	string newpin1 = getPassword("Enter new PIN");
-	string newpin2 = getPassword("Enter new PIN again");
+	string newuser(argv[1]);
 
-	if (newpin1 != newpin2) {
-		cout << "PINs do not match";
-		return 2;
+	if (newuser == "") {
+		cout << "No user provided."
+		return 1;
 	}
 
-	savePin(user, newpin2);
+	ostringstream prompt;
+	prompt << "Enter PIN for new user " << user;
+	string password = getPassword(prompt.str());
+	string secret = getSecret();
+
+	savePin(user, password, secret);
 	::rename(DefaultNewFile.c_str(), DefaultFile.c_str());
 	
+	// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
+	cout << "User added. URL for QR is:"
+	cout << "otpauth://totp/" << user << "@host" << "?secret=" << toBase32(secret);
+
 	return 0;
 }
