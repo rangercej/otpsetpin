@@ -23,9 +23,12 @@ THE SOFTWARE.
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <vector>
 
 #include <unistd.h>
 #include <stdlib.h>
+
+#include "utils.h"
 
 using namespace std;
 
@@ -138,6 +141,8 @@ void savePin (string user, string newpin)
 // Returns: program exit code
 int main(int argc, char **argv)
 {
+	vector<string> args = mkArgs(argc, argv);
+
 	string user = getUserName();
 	if (user == "") {
 		cout << "Could not get current username.";

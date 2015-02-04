@@ -23,6 +23,10 @@ THE SOFTWARE.
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <vector>
+#include <iomanip>
+#include <iterator>
+#include <algorithm>
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -47,18 +51,60 @@ string getPassword(string prompt)
 // Summary: Get a secret for a user
 // Params: none
 // Returns: The secret to use
-string getSecret()
+vector<unsigned short> getSecret()
 {
-	return "";
+	char b;
+	fstream randomStream("/dev/urandom");
+	vector<unsigned short> data;
+
+	for (int i = 0; i < 20; i++)
+	{
+		randomStream.read(&b, 1);
+		data.push_back((unsigned char)b);
+	}
+
+	return data;
+}
+
+//----------------------------------------------------------------------------
+// Summary: Convert the secret to a hex string
+// Params: Secret to convert
+// Returns: Hex version of the secret
+string toHex(vector<unsigned short> data)
+{
+	ostringstream hexString;
+
+	hexString << hex << setfill('0');
+	for (vector<unsigned short>::iterator it = data.begin(); it != data.end(); ++it) {
+		unsigned short x = *it;
+		hexString << setw(2) << x;
+		cout << x << ": " << hexString.str() << endl;
+	}
+
+	return hexString.str();
 }
 
 //----------------------------------------------------------------------------
 // Summary: Convert the secret to a base32 string
 // Params: Secret to convert as a hex string
 // Returns: Base32 version of the secret
-string toBase32(string secret)
+string toBase32(vector<unsigned short> data)
 {
-	return "";
+	const char *b32charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+	unsigned long long value;
+	ostringstream b32String;
+
+	for (unsigned short i = 0; i < data.size(); i+=5)
+	{
+		value = data[i] + data[i+1]*16 + data[i+2]*256 + data[i+3]*4096 + data[i+4]*65536;
+		for (unsigned long long val = value; val != 0 ; val = val >> 5)
+		{
+			int j = val & 31;
+			b32String << b32charset[j];
+		}
+	}
+
+	return b32String.str();
 }
 
 //----------------------------------------------------------------------------
@@ -108,21 +154,24 @@ int main(int argc, char **argv)
 	string newuser(argv[1]);
 
 	if (newuser == "") {
-		cout << "No user provided."
+		cout << "No user provided.";
 		return 1;
 	}
 
 	ostringstream prompt;
-	prompt << "Enter PIN for new user " << user;
+	prompt << "Enter PIN for new user " << newuser;
 	string password = getPassword(prompt.str());
-	string secret = getSecret();
 
-	savePin(user, password, secret);
+	vector<unsigned short> secretbytes = getSecret();
+	string secret = toHex(secretbytes);
+	savePin(newuser, password, secret);
 	::rename(DefaultNewFile.c_str(), DefaultFile.c_str());
+
+cout << secret << endl;
 	
 	// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
-	cout << "User added. URL for QR is:"
-	cout << "otpauth://totp/" << user << "@host" << "?secret=" << toBase32(secret);
+	cout << "User added. URL for QR is:";
+	cout << "otpauth://totp/" << newuser << "@host" << "?secret=" << toBase32(secretbytes) << endl;
 
 	return 0;
 }
