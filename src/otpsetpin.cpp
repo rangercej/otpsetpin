@@ -31,6 +31,17 @@ using namespace std;
 
 const string DefaultFile = "/home/chris/users.auth";
 const string DefaultNewFile = "/home/chris/users.auth.new";
+const string ErrNoPin = "NOPIN";
+
+enum ReturnCodes {
+	RcOkay = 0,
+	RcErrNoUser,
+	RcErrNoOtp,
+	RcErrPinMismatch,
+	RcErrBadPin,
+	RcErrFileError
+};
+	
 
 //----------------------------------------------------------------------------
 // Summary: Get the current login
@@ -83,7 +94,7 @@ string getCurrentPin (string user)
 		}
 	}
 
-	return "";
+	return ErrNoPin;
 }
 
 //----------------------------------------------------------------------------
@@ -128,20 +139,24 @@ void savePin (string user, string newpin)
 int main(int argc, char **argv)
 {
 	string user = getUserName();
-
 	if (user == "") {
-		cout << "User not configured for OTP";
-		return 3;
+		cout << "Could not get current username.";
+		return RcErrNoUser;
+	}
+
+	string currentPin = getCurrentPin(user);
+	if (currentPin == ErrNoPin) {
+		cout << "User not configured for OTP.";
+		return RcErrNoOtp;
 	}
 
 	ostringstream prompt;
 	prompt << "Enter existing PIN for " << user;
 	string password = getPassword(prompt.str());
-	string currentPin = getCurrentPin(user);
 
 	if (password != currentPin) {
 		cout << "Invalid PIN." << endl;
-		return 1;
+		return RcErrBadPin;
 	}
 
 	string newpin1 = getPassword("Enter new PIN");
@@ -149,11 +164,11 @@ int main(int argc, char **argv)
 
 	if (newpin1 != newpin2) {
 		cout << "PINs do not match";
-		return 2;
+		return RcErrPinMismatch;
 	}
 
 	savePin(user, newpin2);
 	::rename(DefaultNewFile.c_str(), DefaultFile.c_str());
 	
-	return 0;
+	return RcOkay;
 }
