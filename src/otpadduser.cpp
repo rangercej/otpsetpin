@@ -31,6 +31,8 @@ THE SOFTWARE.
 #include <unistd.h>
 #include <stdlib.h>
 
+#include <liboath/oath.h>
+
 #include "utils.h"
 #include "options.h"
 
@@ -68,60 +70,39 @@ string getHostName()
 // Summary: Get a secret for a user
 // Params: none
 // Returns: The secret to use
-vector<unsigned short> getSecret()
+void getSecret(char *target)
 {
-	char b;
+	char *p = (char*)target;
 	fstream randomStream("/dev/urandom");
-	vector<unsigned short> data;
-
-	for (int i = 0; i < 20; i++)
-	{
-		randomStream.read(&b, 1);
-		data.push_back((unsigned char)b);
-	}
-
-	return data;
+	randomStream.read(p, SECRETLENGTH);
 }
 
 //----------------------------------------------------------------------------
 // Summary: Convert the secret to a hex string
 // Params: Secret to convert
 // Returns: Hex version of the secret
-string toHex(vector<unsigned short> data)
+string toHex(char *secret)
 {
-	ostringstream hexString;
+	char hexBuffer[1024];
+	oath_bin2hex(secret, SECRETLENGTH, hexBuffer);
 
-	hexString << hex << setfill('0');
-	for (vector<unsigned short>::iterator it = data.begin(); it != data.end(); ++it) {
-		unsigned short x = *it;
-		hexString << setw(2) << x;
-		cout << x << ": " << hexString.str() << endl;
-	}
-
-	return hexString.str();
+	return string(hexBuffer);
 }
 
 //----------------------------------------------------------------------------
 // Summary: Convert the secret to a base32 string
 // Params: Secret to convert as a hex string
 // Returns: Base32 version of the secret
-string toBase32(vector<unsigned short> data)
+string toBase32(char *secret)
 {
-	const char *b32charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-	unsigned long long value;
-	ostringstream b32String;
+	char *b32Buffer;
+	size_t b32Length;
+	oath_base32_encode(secret, SECRETLENGTH, &b32Buffer, &b32Length);
 
-	for (unsigned short i = 0; i < data.size(); i+=5)
-	{
-		value = data[i] + data[i+1]*16 + data[i+2]*256 + data[i+3]*4096 + data[i+4]*65536;
-		for (unsigned long long val = value; val != 0 ; val = val >> 5)
-		{
-			int j = val & 31;
-			b32String << b32charset[j];
-		}
-	}
+	string b32Secret(b32Buffer);
+	::free(b32Buffer);
 
-	return b32String.str();
+	return b32Secret;
 }
 
 //----------------------------------------------------------------------------
@@ -134,28 +115,40 @@ string toBase32(vector<unsigned short> data)
 void savePin (string user, string newpin, string secret)
 {
 	string tempFile = options.DefaultAuthFile + ".new";
-	ifstream authFile(options.DefaultAuthFile.c_str());
-	ofstream newAuthFile(tempFile.c_str());
 	string type;
 	string userin;
 	string pin, temp;
 	bool userwrote = false;
 	
-	while (authFile >> type >> userin >> temp)
 	{
-		if (userin != user) {
-			newAuthFile << type << " " << userin << " " << temp << endl;
-		} else {
-			newAuthFile << type << " " << user << " " << newpin << " " << secret << endl;
-			userwrote = true;
+		ifstream authFile(options.DefaultAuthFile.c_str());
+		ofstream newAuthFile(tempFile.c_str());
+
+		if (newAuthFile.fail()) {
+			throw "Failed to open auth file.";
+		}
+
+		while (authFile >> type >> userin >> temp)
+		{
+			if (userin != user) {
+				newAuthFile << type << " " << userin << " " << temp << endl;
+			} else {
+				newAuthFile << type << " " << user << " " << newpin << " " << secret << endl;
+				userwrote = true;
+			}
+		}
+
+		if (!userwrote) {
+			newAuthFile << "HOTP/T30 " << user << " " << newpin << " " << secret << endl;
 		}
 	}
 
-	if (!userwrote) {
-		newAuthFile << "HOTP/T30 " << user << " " << newpin << " " << secret << endl;
+	int val = ::rename(tempFile.c_str(), options.DefaultAuthFile.c_str());
+	if (val != 0) {
+		ostringstream errtxt;
+		errtxt << "Failed to update auth file: " << options.DefaultAuthFile;
+		throw errtxt.str();
 	}
-
-	::rename(options.DefaultAuthFile.c_str(), tempFile.c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -184,13 +177,24 @@ int main(int argc, char **argv)
 	prompt << "Enter PIN for new user " << newuser;
 	string password = getPassword(prompt.str());
 
-	vector<unsigned short> secretbytes = getSecret();
-	string secret = toHex(secretbytes);
-	savePin(newuser, password, secret);
+	try {
+		char secretbytes[64];
+		getSecret(secretbytes);
+		string secret = toHex(secretbytes);
+		savePin(newuser, password, secret);
 
-	// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
-	cout << "User added. URL for QR is:";
-	cout << "otpauth://totp/" << newuser << "@" << getHostName() << "?secret=" << toBase32(secretbytes) << endl;
+		// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
+		cout << "User added. URL for QR is:";
+		cout << "otpauth://totp/" << newuser << "@" << getHostName() << "?secret=" << toBase32(secretbytes) << endl;
+	}
+	catch (const char* msg)
+	{
+		cerr << "ERROR: " << msg << endl;
+	}
+	catch (string msg)
+	{
+		cerr << "ERROR: " << msg << endl;
+	}
 
 	return 0;
 }

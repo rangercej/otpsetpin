@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#define SECRETLENGTH	32
+
 std::vector<std::string> mkArgs(int, char **);
 
 #endif
