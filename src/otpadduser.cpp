@@ -31,10 +31,12 @@ THE SOFTWARE.
 #include <unistd.h>
 #include <stdlib.h>
 
+#include "utils.h"
+#include "options.h"
+
 using namespace std;
 
-const string DefaultFile = "/home/chris/users.auth";
-const string DefaultNewFile = "/home/chris/users.auth.new";
+Options options;
 
 //----------------------------------------------------------------------------
 // Summary: Get a password/PIN from the terminal
@@ -45,6 +47,21 @@ string getPassword(string prompt)
 {
 	prompt.append(": ");
 	return getpass(prompt.c_str());
+}
+
+//----------------------------------------------------------------------------
+// Summary: Get the computer name
+// Params: none
+// Returns: computer name, or UNKNOWN on error
+string getHostName()
+{
+	char hostBuffer[256];
+	int result = gethostname(hostBuffer, sizeof(hostBuffer));
+	if (result == -1) {
+		return "[UNKNOWN]";
+	} else {
+		return hostBuffer;
+	}
 }
 
 //----------------------------------------------------------------------------
@@ -116,8 +133,9 @@ string toBase32(vector<unsigned short> data)
 // Returns: nothing
 void savePin (string user, string newpin, string secret)
 {
-	ifstream authFile(DefaultFile.c_str());
-	ofstream newAuthFile(DefaultNewFile.c_str());
+	string tempFile = options.DefaultAuthFile + ".new";
+	ifstream authFile(options.DefaultAuthFile.c_str());
+	ofstream newAuthFile(tempFile.c_str());
 	string type;
 	string userin;
 	string pin, temp;
@@ -136,6 +154,8 @@ void savePin (string user, string newpin, string secret)
 	if (!userwrote) {
 		newAuthFile << "HOTP/T30 " << user << " " << newpin << " " << secret << endl;
 	}
+
+	::rename(options.DefaultAuthFile.c_str(), tempFile.c_str());
 }
 
 //----------------------------------------------------------------------------
@@ -151,6 +171,8 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	vector<string> args = mkArgs(argc, argv);
+
 	string newuser(argv[1]);
 
 	if (newuser == "") {
@@ -165,13 +187,10 @@ int main(int argc, char **argv)
 	vector<unsigned short> secretbytes = getSecret();
 	string secret = toHex(secretbytes);
 	savePin(newuser, password, secret);
-	::rename(DefaultNewFile.c_str(), DefaultFile.c_str());
 
-cout << secret << endl;
-	
 	// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
 	cout << "User added. URL for QR is:";
-	cout << "otpauth://totp/" << newuser << "@host" << "?secret=" << toBase32(secretbytes) << endl;
+	cout << "otpauth://totp/" << newuser << "@" << getHostName() << "?secret=" << toBase32(secretbytes) << endl;
 
 	return 0;
 }

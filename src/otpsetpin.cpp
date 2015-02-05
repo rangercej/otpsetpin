@@ -29,11 +29,10 @@ THE SOFTWARE.
 #include <stdlib.h>
 
 #include "utils.h"
+#include "options.h"
 
 using namespace std;
 
-const string DefaultFile = "/home/chris/users.auth";
-const string DefaultNewFile = "/home/chris/users.auth.new";
 const string ErrNoPin = "NOPIN";
 
 enum ReturnCodes {
@@ -45,6 +44,7 @@ enum ReturnCodes {
 	RcErrFileError
 };
 	
+Options options;
 
 //----------------------------------------------------------------------------
 // Summary: Get the current login
@@ -79,7 +79,7 @@ string getPassword(string prompt)
 // Returns: PIN in the auth file, or empty string if user is not yet listed
 string getCurrentPin (string user)
 {
-	ifstream authFile(DefaultFile.c_str());
+	ifstream authFile(options.DefaultAuthFile.c_str());
 	string type;
 	string userin;
 	string pin, temp;
@@ -109,27 +109,32 @@ string getCurrentPin (string user)
 // Returns: nothing
 void savePin (string user, string newpin)
 {
-	ifstream authFile(DefaultFile.c_str());
-	ofstream newAuthFile(DefaultNewFile.c_str());
 	string type;
 	string userin;
 	string pin, temp;
 	bool userwrote = false;
+	string tempFile = options.DefaultAuthFile + ".new";
 	
-	while (authFile >> type >> userin >> pin >> temp)
 	{
-		if (userin != user) {
-			newAuthFile << type << " " << userin << " " << pin << " " << temp << endl;
-		} else {
-			newAuthFile << type << " " << user << " " << newpin << " " << temp << endl;
-			userwrote = true;
+		ifstream authFile(options.DefaultAuthFile.c_str());
+		ofstream newAuthFile(tempFile.c_str());
+		while (authFile >> type >> userin >> pin >> temp)
+		{
+			if (userin != user) {
+				newAuthFile << type << " " << userin << " " << pin << " " << temp << endl;
+			} else {
+				newAuthFile << type << " " << user << " " << newpin << " " << temp << endl;
+				userwrote = true;
+			}
 		}
-	}
+	}	
 
 	if (!userwrote) {
 		// We should never call this, but have it in just in case
 		// something happens (a race possibly?).
 		cerr << "Error - didn't update user " << user << ". User removed from OTP?" << endl;
+	} else {
+		::rename(tempFile.c_str(), options.DefaultAuthFile.c_str());
 	}
 }
 
@@ -173,7 +178,6 @@ int main(int argc, char **argv)
 	}
 
 	savePin(user, newpin2);
-	::rename(DefaultNewFile.c_str(), DefaultFile.c_str());
 	
 	return RcOkay;
 }
