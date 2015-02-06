@@ -31,7 +31,9 @@ THE SOFTWARE.
 #include <unistd.h>
 #include <stdlib.h>
 
+extern "C" {
 #include <liboath/oath.h>
+}
 
 #include "utils.h"
 #include "options.h"
