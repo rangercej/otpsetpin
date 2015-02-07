@@ -44,7 +44,7 @@ class Utils
 
 		static std::string toHex(char *bytes);
 		static std::string toBase32(char *bytes);
-		static std::string hexToBase32(string hexString);
+		static std::string hexToBase32(std::string hexString);
 };
 
 #endif

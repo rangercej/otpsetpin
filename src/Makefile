@@ -511,7 +511,49 @@ options.o: options.cpp /usr/include/stdc-predef.h options.h \
  /usr/include/i386-linux-gnu/bits/pthreadtypes.h \
  /usr/include/i386-linux-gnu/bits/setjmp.h \
  /usr/include/i386-linux-gnu/c++/4.9/bits/atomic_word.h \
- /usr/include/c++/4.9/bits/basic_string.tcc
+ /usr/include/c++/4.9/bits/basic_string.tcc /usr/include/c++/4.9/vector \
+ /usr/include/c++/4.9/bits/stl_construct.h \
+ /usr/include/c++/4.9/ext/alloc_traits.h \
+ /usr/include/c++/4.9/bits/stl_uninitialized.h \
+ /usr/include/c++/4.9/bits/stl_vector.h \
+ /usr/include/c++/4.9/bits/stl_bvector.h \
+ /usr/include/c++/4.9/bits/vector.tcc /usr/include/c++/4.9/fstream \
+ /usr/include/c++/4.9/istream /usr/include/c++/4.9/ios \
+ /usr/include/c++/4.9/bits/ios_base.h \
+ /usr/include/c++/4.9/bits/locale_classes.h \
+ /usr/include/c++/4.9/bits/locale_classes.tcc \
+ /usr/include/c++/4.9/streambuf /usr/include/c++/4.9/bits/streambuf.tcc \
+ /usr/include/c++/4.9/bits/basic_ios.h \
+ /usr/include/c++/4.9/bits/locale_facets.h /usr/include/c++/4.9/cwctype \
+ /usr/include/wctype.h \
+ /usr/include/i386-linux-gnu/c++/4.9/bits/ctype_base.h \
+ /usr/include/c++/4.9/bits/streambuf_iterator.h \
+ /usr/include/i386-linux-gnu/c++/4.9/bits/ctype_inline.h \
+ /usr/include/c++/4.9/bits/locale_facets.tcc \
+ /usr/include/c++/4.9/bits/basic_ios.tcc /usr/include/c++/4.9/ostream \
+ /usr/include/c++/4.9/bits/ostream.tcc \
+ /usr/include/c++/4.9/bits/istream.tcc \
+ /usr/include/c++/4.9/bits/codecvt.h /usr/include/c++/4.9/cstdio \
+ /usr/include/libio.h /usr/include/_G_config.h \
+ /usr/include/i386-linux-gnu/bits/stdio_lim.h \
+ /usr/include/i386-linux-gnu/bits/sys_errlist.h \
+ /usr/include/i386-linux-gnu/c++/4.9/bits/basic_file.h \
+ /usr/include/i386-linux-gnu/c++/4.9/bits/c++io.h \
+ /usr/include/c++/4.9/bits/fstream.tcc /usr/include/c++/4.9/sstream \
+ /usr/include/c++/4.9/bits/sstream.tcc /usr/include/c++/4.9/algorithm \
+ /usr/include/c++/4.9/utility /usr/include/c++/4.9/bits/stl_relops.h \
+ /usr/include/c++/4.9/bits/stl_algo.h /usr/include/c++/4.9/cstdlib \
+ /usr/include/stdlib.h /usr/include/i386-linux-gnu/bits/waitflags.h \
+ /usr/include/i386-linux-gnu/bits/waitstatus.h \
+ /usr/include/i386-linux-gnu/sys/types.h \
+ /usr/include/i386-linux-gnu/sys/select.h \
+ /usr/include/i386-linux-gnu/bits/select.h \
+ /usr/include/i386-linux-gnu/bits/sigset.h \
+ /usr/include/i386-linux-gnu/sys/sysmacros.h /usr/include/alloca.h \
+ /usr/include/i386-linux-gnu/bits/stdlib-float.h \
+ /usr/include/c++/4.9/bits/algorithmfwd.h \
+ /usr/include/c++/4.9/bits/stl_heap.h \
+ /usr/include/c++/4.9/bits/stl_tempbuf.h /usr/include/c++/4.9/iostream
 userinfo.o: userinfo.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/4.9/string \
  /usr/include/i386-linux-gnu/c++/4.9/bits/c++config.h \

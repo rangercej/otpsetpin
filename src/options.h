@@ -24,15 +24,29 @@ THE SOFTWARE.
 #define __OTP_OPTIONS_H_
 
 #include <string>
-
-using namespace std;
+#include <vector>
 
 class Options
 {
+	private:
+		std::string ConfigFile;
+
+		void ReadOptions();
+		void SetDefaults();
+
+		static std::vector<std::string> split(const std::string &s, char delim);
+		static void split(const std::string &s, char delim, std::vector<std::string> & target);
+
+		static std::string & rtrim(std::string &s);
+		static std::string & ltrim(std::string &s);
+		static std::string & trim(std::string &s);
 	public:
-		string DefaultAuthFile;
+		std::string DefaultAuthFile;
+		std::string Issuer;
+		int Digits;
 
 		Options();
+		Options(std::string configFile);
 };
 
 #endif
