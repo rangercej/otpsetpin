@@ -26,10 +26,11 @@ THE SOFTWARE.
 #include <vector>
 
 #include <cstdlib>
-#include <cpwd>
-#include <sys/ctypes>
 
-#include <unistd.h>
+extern "C" {
+	#include <unistd.h>
+	#include <pwd.h>
+}
 
 #include "utils.h"
 #include "options.h"
@@ -52,7 +53,7 @@ Options options;
 //----------------------------------------------------------------------------
 // Summary: user in system authentication database (/etc/passwd)
 // Returns: true or false
-string isUserKnownToSystem(string username)
+bool isUserKnownToSystem(string username)
 {
 	if (username == "") {
 		return false;
@@ -89,14 +90,14 @@ string getUser(string user)
 // Returns: current login ID
 string getCurrentUser()
 {
-	char username[64] = {0};
-	int namelen = getlogin_r(username, sizeof(username) - 1);
+	int uid = geteuid();
 
-	if (namelen != 0) {
+	struct passwd *userData = getpwuid(uid);
+	if (userData == NULL) {
 		throw "Could not determine current user";
 	}
 
-	return username;
+	return string(userData->pw_name);
 }
 
 //----------------------------------------------------------------------------
@@ -135,7 +136,9 @@ string getCurrentPin (string user)
 		}
 	}
 
-	throw "User not configured for OTP";
+	stringstream err;
+	err << "User not configured for OTP: " << user;
+	throw err.str();
 }
 
 //----------------------------------------------------------------------------
@@ -172,7 +175,7 @@ void savePin (string user, string newpin)
 		// something happens (a race possibly?).
 		stringstream err;
 		err << "Error - didn't update user " << user << ". User removed from OTP?";
-		throw err;
+		throw err.str();
 	} else {
 		::rename(tempFile.c_str(), options.DefaultAuthFile.c_str());
 	}
@@ -190,13 +193,12 @@ int main(int argc, char **argv)
 
 	string user;
 	try {
-		if (args.length > 0) {
-			user = getUser(args[0]);
+		if (args.size() > 1) {
+			user = getUser(args[1]);
 		} else {
 			user = getCurrentUser();
 		}
 	
-		string user = getUserName();
 		string currentPin = getCurrentPin(user);
 
 		ostringstream prompt;
@@ -221,9 +223,9 @@ int main(int argc, char **argv)
 		return RcOkay;
 	}
 	catch (const char *msg) {
-		cerr << msg;
+		cerr << msg << endl;
 	}
-	catch (stringstream msg) {
-		cerr << msg.str();
+	catch (string msg) {
+		cerr << msg << endl;
 	}
 }
