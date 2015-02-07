@@ -25,6 +25,7 @@ THE SOFTWARE.
 #include <iostream>
 
 #include "userinfo.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -46,7 +47,7 @@ void UserInfo::Get()
 {
 	string type;
 	string userin;
-	string pin, secret;
+	string pin, secret, temp;
 	
 	ifstream authFile(AuthFileName.c_str());
 	if (authFile.fail())
@@ -54,13 +55,15 @@ void UserInfo::Get()
 		throw "Cannot open authorisation file.";
 	}
 
-	while (authFile >> type >> userin >> pin >> secret) {
+	while (authFile >> type >> userin >> pin >> secret && getline(authFile, temp)) {
+		cout << UserId << "|" << userin  << endl;
 		if (userin == UserId) {
 			Mode = type;
 			PinNumber = pin;
 			Secret = secret;
 		}
 	}
+
 }
 
 //----------------------------------------------------------------------------
@@ -130,4 +133,12 @@ void UserInfo::Create()
 	}	
 
 	::rename(tempFile.c_str(), AuthFileName.c_str());
+}
+
+string UserInfo::GetUrl()
+{
+	stringstream url;
+	url << "otppath://totp/otpsetpin:" << UserId << "?secret=" << Utils::hexToBase32(Secret) << endl;
+
+	return url.str();
 }

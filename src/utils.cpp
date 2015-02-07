@@ -24,22 +24,22 @@ THE SOFTWARE.
 #include <fstream>
 #include <sstream>
 
-#include "options.h"
-#include "utils.h"
-#include "userinfo.h"
+#include <cstdlib>
 
 extern "C" {
 	#include <unistd.h>
 	#include <pwd.h>
+	#include "liboath/oath.h"
 }
+
+#include "utils.h"
+#include "userinfo.h"
 
 using namespace std;
 
 //----------------------------------------------------------------------------
-//
-Utils::Utils(const Options & opts)
+Utils::Utils()
 {
-	options = opts;
 }
 
 //----------------------------------------------------------------------------
@@ -54,6 +54,15 @@ vector<string> Utils::mkArgs (int argc, char **argv)
 	}
 
 	return args;
+}
+
+//----------------------------------------------------------------------------
+// Summary: Is the effective UID root?
+// Params: none
+// Returns: true if running as root.
+bool Utils::runningAsRoot()
+{
+	return 0 == getuid();
 }
 
 //----------------------------------------------------------------------------
@@ -106,8 +115,8 @@ bool Utils::isUserKnownToSystem(string username)
 // Returns: passed in username
 string Utils::getUser(string user)
 {
-	int euid = geteuid();
-	if (euid != 0) {
+	int uid = getuid();
+	if (uid != 0) {
 		throw "Cannot change another user's PIN";
 	}
 
@@ -125,7 +134,7 @@ string Utils::getUser(string user)
 // Returns: current login ID
 string Utils::getCurrentUser()
 {
-	int uid = geteuid();
+	int uid = getuid();
 
 	struct passwd *userData = getpwuid(uid);
 	if (userData == NULL) {
@@ -133,4 +142,51 @@ string Utils::getCurrentUser()
 	}
 
 	return string(userData->pw_name);
+}
+
+//----------------------------------------------------------------------------
+// Summary: Convert bytes to a hex string
+// Params: Secret to convert
+// Returns: Hex version of the secret
+string Utils::toHex(char *secret)
+{
+	char hexBuffer[1024];
+	oath_bin2hex(secret, SECRETLENGTH, hexBuffer);
+
+	return string(hexBuffer);
+}
+
+//----------------------------------------------------------------------------
+// Summary: Convert bytes to a base32 string
+// Params: Secret to convert as a hex string
+// Returns: Base32 version of the secret
+string Utils::toBase32(char *secret)
+{
+	char *b32Buffer;
+	size_t b32Length;
+	oath_base32_encode(secret, SECRETLENGTH, &b32Buffer, &b32Length);
+
+	string b32Secret(b32Buffer);
+	::free(b32Buffer);
+
+	return b32Secret;
+}
+
+//----------------------------------------------------------------------------
+// Summary: Convert hexstring to a base32 string
+// Params: Hex string to convert
+// Returns: Base32 version of the string
+string Utils::hexToBase32(string hexString)
+{
+	char bytes[128];
+	size_t byteLen = sizeof(bytes);
+	int ok = oath_hex2bin (hexString.c_str(), bytes, &byteLen);
+
+	if (ok != OATH_OK) {
+		stringstream err;
+		err << "Erro converting hex string: " << ok;
+		throw err.str();
+	}
+
+	return toBase32(bytes);
 }

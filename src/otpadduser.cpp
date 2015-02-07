@@ -41,7 +41,6 @@ extern "C" {
 using namespace std;
 
 Options options;
-Utils utils(options);
 
 //----------------------------------------------------------------------------
 // Summary: Get the computer name
@@ -70,80 +69,6 @@ void getSecret(char *target)
 }
 
 //----------------------------------------------------------------------------
-// Summary: Convert the secret to a hex string
-// Params: Secret to convert
-// Returns: Hex version of the secret
-string toHex(char *secret)
-{
-	char hexBuffer[1024];
-	oath_bin2hex(secret, SECRETLENGTH, hexBuffer);
-
-	return string(hexBuffer);
-}
-
-//----------------------------------------------------------------------------
-// Summary: Convert the secret to a base32 string
-// Params: Secret to convert as a hex string
-// Returns: Base32 version of the secret
-string toBase32(char *secret)
-{
-	char *b32Buffer;
-	size_t b32Length;
-	oath_base32_encode(secret, SECRETLENGTH, &b32Buffer, &b32Length);
-
-	string b32Secret(b32Buffer);
-	::free(b32Buffer);
-
-	return b32Secret;
-}
-
-//----------------------------------------------------------------------------
-// Summary: Add the user for OTP auth
-// Params:
-//     user   - User that we're adding/updating
-//     newpin - PIN for the user
-//     secret - Shared secret for the user
-// Returns: nothing
-void savePin (string user, string newpin, string secret)
-{
-	string tempFile = options.DefaultAuthFile + ".new";
-	string type;
-	string userin;
-	string pin, temp;
-	bool userwrote = false;
-	
-	{
-		ifstream authFile(options.DefaultAuthFile.c_str());
-		ofstream newAuthFile(tempFile.c_str());
-
-		if (newAuthFile.fail()) {
-			throw "Failed to open auth file.";
-		}
-
-		while (authFile >> type >> userin && getline(authFile, temp))
-		{
-			if (userin != user) {
-				newAuthFile << type << " " << userin << " " << temp << endl;
-			} else {
-				newAuthFile << type << " " << user << " " << newpin << " " << secret << endl;
-				userwrote = true;
-			}
-		}
-
-		if (!userwrote) {
-			newAuthFile << "HOTP/T30 " << user << " " << newpin << " " << secret << endl;
-		}
-	}
-
-	int val = ::rename(tempFile.c_str(), options.DefaultAuthFile.c_str());
-	if (val != 0) {
-		ostringstream errtxt;
-		errtxt << "Failed to update auth file: " << options.DefaultAuthFile;
-		throw errtxt.str();
-	}
-}
-
-//----------------------------------------------------------------------------
 // Summary: Program entry point
 // Params:
 //     argc - Count of command line parameters
@@ -156,7 +81,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	vector<string> args = utils.mkArgs(argc, argv);
+	vector<string> args = Utils::mkArgs(argc, argv);
 
 	string newuser(argv[1]);
 
@@ -167,17 +92,23 @@ int main(int argc, char **argv)
 
 	ostringstream prompt;
 	prompt << "Enter PIN for new user " << newuser;
-	string password = utils.getPassword(prompt.str());
+	string password = Utils::getPassword(prompt.str());
 
 	try {
 		char secretbytes[64];
 		getSecret(secretbytes);
-		string secret = toHex(secretbytes);
-		savePin(newuser, password, secret);
+		string secret = Utils::toHex(secretbytes);
+
+		UserInfo userinfo(newuser, options.DefaultAuthFile);
+		userinfo.Mode = "HOTP/T30";
+		userinfo.PinNumber = password;
+		userinfo.Secret = secret;
+		userinfo.Create();
 
 		// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
 		cout << "User added. URL for QR is:" << endl;
-		cout << "otpauth://totp/otpsetpin:" << newuser << "@" << getHostName() << "?secret=" << toBase32(secretbytes) << endl;
+		cout << userinfo.GetUrl();
+		//cout << "otpauth://totp/otpsetpin:" << newuser << "@" << getHostName() << "?secret=" << toBase32(secretbytes) << endl;
 	}
 	catch (const char* msg)
 	{

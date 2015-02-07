@@ -31,18 +31,20 @@ THE SOFTWARE.
 
 class Utils
 {
-	private:
-		Options options;
-
 	public:
-		Utils(const Options & options);
+		Utils();
 
-		std::vector<std::string> mkArgs (int argc, char **argv);
-		std::string getPassword(std::string prompt);
-		bool validateUserPin(UserInfo & user);
-		bool isUserKnownToSystem(std::string username);
-		std::string getUser(std::string user);
-		std::string getCurrentUser();
+		static bool runningAsRoot();
+		static std::vector<std::string> mkArgs (int argc, char **argv);
+		static std::string getPassword(std::string prompt);
+		static bool validateUserPin(UserInfo & user);
+		static bool isUserKnownToSystem(std::string username);
+		static std::string getUser(std::string user);
+		static std::string getCurrentUser();
+
+		static std::string toHex(char *bytes);
+		static std::string toBase32(char *bytes);
+		static std::string hexToBase32(string hexString);
 };
 
 #endif

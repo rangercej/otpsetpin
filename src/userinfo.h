@@ -37,6 +37,7 @@ class UserInfo {
 	void Get();
 	void Update();
 	void Create();
+	std::string GetUrl();
 };
 
 #endif

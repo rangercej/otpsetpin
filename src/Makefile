@@ -328,11 +328,22 @@ utils.o: utils.cpp /usr/include/stdc-predef.h /usr/include/c++/4.9/vector \
  /usr/include/i386-linux-gnu/c++/4.9/bits/basic_file.h \
  /usr/include/i386-linux-gnu/c++/4.9/bits/c++io.h \
  /usr/include/c++/4.9/bits/fstream.tcc /usr/include/c++/4.9/sstream \
- /usr/include/c++/4.9/bits/sstream.tcc options.h utils.h userinfo.h \
- /usr/include/unistd.h /usr/include/i386-linux-gnu/bits/posix_opt.h \
+ /usr/include/c++/4.9/bits/sstream.tcc /usr/include/c++/4.9/cstdlib \
+ /usr/include/stdlib.h /usr/include/i386-linux-gnu/bits/waitflags.h \
+ /usr/include/i386-linux-gnu/bits/waitstatus.h \
+ /usr/include/i386-linux-gnu/sys/types.h \
+ /usr/include/i386-linux-gnu/sys/select.h \
+ /usr/include/i386-linux-gnu/bits/select.h \
+ /usr/include/i386-linux-gnu/bits/sigset.h \
+ /usr/include/i386-linux-gnu/sys/sysmacros.h /usr/include/alloca.h \
+ /usr/include/i386-linux-gnu/bits/stdlib-float.h /usr/include/unistd.h \
+ /usr/include/i386-linux-gnu/bits/posix_opt.h \
  /usr/include/i386-linux-gnu/bits/environments.h \
  /usr/include/i386-linux-gnu/bits/confname.h /usr/include/getopt.h \
- /usr/include/pwd.h
+ /usr/include/pwd.h /usr/include/liboath/oath.h \
+ /usr/lib/gcc/i586-linux-gnu/4.9/include/stdbool.h \
+ /usr/lib/gcc/i586-linux-gnu/4.9/include/stdint.h /usr/include/stdint.h \
+ /usr/include/string.h utils.h options.h userinfo.h
 options.o: options.cpp /usr/include/stdc-predef.h options.h \
  /usr/include/c++/4.9/string \
  /usr/include/i386-linux-gnu/c++/4.9/bits/c++config.h \
@@ -482,4 +493,10 @@ userinfo.o: userinfo.cpp /usr/include/stdc-predef.h \
  /usr/include/i386-linux-gnu/c++/4.9/bits/basic_file.h \
  /usr/include/i386-linux-gnu/c++/4.9/bits/c++io.h \
  /usr/include/c++/4.9/bits/fstream.tcc /usr/include/c++/4.9/iostream \
- userinfo.h
+ userinfo.h utils.h /usr/include/c++/4.9/vector \
+ /usr/include/c++/4.9/bits/stl_construct.h \
+ /usr/include/c++/4.9/ext/alloc_traits.h \
+ /usr/include/c++/4.9/bits/stl_uninitialized.h \
+ /usr/include/c++/4.9/bits/stl_vector.h \
+ /usr/include/c++/4.9/bits/stl_bvector.h \
+ /usr/include/c++/4.9/bits/vector.tcc options.h

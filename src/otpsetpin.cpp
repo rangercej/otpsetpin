@@ -27,7 +27,6 @@ THE SOFTWARE.
 
 #include <cstdlib>
 
-
 #include "utils.h"
 #include "options.h"
 #include "userinfo.h"
@@ -40,8 +39,6 @@ const int RcOkay = 0;
 const int RcError = 1;
 	
 Options options;
-Utils utils(options);
-
 
 //----------------------------------------------------------------------------
 // Summary: Program entry point
@@ -51,24 +48,26 @@ Utils utils(options);
 // Returns: program exit code
 int main(int argc, char **argv)
 {
-	vector<string> args = utils.mkArgs(argc, argv);
+	vector<string> args = Utils::mkArgs(argc, argv);
 
 	string user;
 	try {
 		if (args.size() > 1) {
-			user = utils.getUser(args[1]);
+			user = Utils::getUser(args[1]);
 		} else {
-			user = utils.getCurrentUser();
+			user = Utils::getCurrentUser();
 		}
 	
 		UserInfo userinfo(user, options.DefaultAuthFile);
 
-		if (!utils.validateUserPin(userinfo)) {
-			throw "Invalid PIN.";
+		if (!Utils::runningAsRoot()) {
+			if (!Utils::validateUserPin(userinfo)) {
+				throw "Invalid PIN.";
+			}
 		}
 	
-		string newpin1 = utils.getPassword("Enter new PIN");
-		string newpin2 = utils.getPassword("Enter new PIN again");
+		string newpin1 = Utils::getPassword("Enter new PIN");
+		string newpin2 = Utils::getPassword("Enter new PIN again");
 	
 		if (newpin1 != newpin2) {
 			throw "PINs do not match.";
