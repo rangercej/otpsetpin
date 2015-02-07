@@ -130,7 +130,7 @@ void savePin (string user, string newpin, string secret)
 			throw "Failed to open auth file.";
 		}
 
-		while (authFile >> type >> userin >> temp)
+		while (authFile >> type >> userin && getline(authFile, temp))
 		{
 			if (userin != user) {
 				newAuthFile << type << " " << userin << " " << temp << endl;
@@ -186,8 +186,8 @@ int main(int argc, char **argv)
 		savePin(newuser, password, secret);
 
 		// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
-		cout << "User added. URL for QR is:";
-		cout << "otpauth://totp/" << newuser << "@" << getHostName() << "?secret=" << toBase32(secretbytes) << endl;
+		cout << "User added. URL for QR is:" << endl;
+		cout << "otpauth://totp/otpsetpin:" << newuser << "@" << getHostName() << "?secret=" << toBase32(secretbytes) << endl;
 	}
 	catch (const char* msg)
 	{
