@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "utils.h"
 #include "options.h"
+#include "userinfo.h"
 
 using namespace std;
 
@@ -41,45 +42,6 @@ const int RcError = 1;
 Options options;
 Utils utils(options);
 
-//----------------------------------------------------------------------------
-// Summary: Update the PIN for the user in the auth file (or add the user if
-//	the login doesn't already exist
-// Params:
-//     user   - User that we're adding/updating
-//     newpin - PIN for the user
-// Returns: nothing
-void savePin (string user, string newpin)
-{
-	string type;
-	string userin;
-	string pin, temp;
-	bool userwrote = false;
-	string tempFile = options.DefaultAuthFile + ".new";
-	
-	{
-		ifstream authFile(options.DefaultAuthFile.c_str());
-		ofstream newAuthFile(tempFile.c_str());
-		while (authFile >> type >> userin >> pin >> temp)
-		{
-			if (userin != user) {
-				newAuthFile << type << " " << userin << " " << pin << " " << temp << endl;
-			} else {
-				newAuthFile << type << " " << user << " " << newpin << " " << temp << endl;
-				userwrote = true;
-			}
-		}
-	}	
-
-	if (!userwrote) {
-		// We should never call this, but have it in just in case
-		// something happens (a race possibly?).
-		stringstream err;
-		err << "Error - didn't update user " << user << ". User removed from OTP?";
-		throw err.str();
-	} else {
-		::rename(tempFile.c_str(), options.DefaultAuthFile.c_str());
-	}
-}
 
 //----------------------------------------------------------------------------
 // Summary: Program entry point
@@ -99,7 +61,9 @@ int main(int argc, char **argv)
 			user = utils.getCurrentUser();
 		}
 	
-		if (utils.validateUserPin(user)) {
+		UserInfo userinfo(user, options.DefaultAuthFile);
+
+		if (!utils.validateUserPin(userinfo)) {
 			throw "Invalid PIN.";
 		}
 	
@@ -110,7 +74,8 @@ int main(int argc, char **argv)
 			throw "PINs do not match.";
 		}
 	
-		savePin(user, newpin2);
+		userinfo.PinNumber = newpin2;
+		userinfo.Update();
 		
 		return RcOkay;
 	}

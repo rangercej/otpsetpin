@@ -19,30 +19,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
+#ifndef __OTP_USERINFO_H_
+#define __OTP_USERINFO_H_
 
-#ifndef __OTP_UTILS_H_
-#define __OTP_UTILS_H_
+class UserInfo {
 
-#include <vector>
-#include "options.h"
-#include "userinfo.h"
-
-#define SECRETLENGTH	32
-
-class Utils
-{
 	private:
-		Options options;
+		std::string AuthFileName;
 
 	public:
-		Utils(const Options & options);
+		std::string UserId;
+		std::string PinNumber;
+		std::string Mode;
+		std::string Secret;
 
-		std::vector<std::string> mkArgs (int argc, char **argv);
-		std::string getPassword(std::string prompt);
-		bool validateUserPin(UserInfo & user);
-		bool isUserKnownToSystem(std::string username);
-		std::string getUser(std::string user);
-		std::string getCurrentUser();
+	UserInfo(std::string userId, std::string authFileName);
+	void Get();
+	void Update();
+	void Create();
 };
 
 #endif
