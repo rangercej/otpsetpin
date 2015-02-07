@@ -41,17 +41,7 @@ extern "C" {
 using namespace std;
 
 Options options;
-
-//----------------------------------------------------------------------------
-// Summary: Get a password/PIN from the terminal
-// Params:
-//     prompt - The prompt to display to the user
-// Returns: User entered password.
-string getPassword(string prompt)
-{
-	prompt.append(": ");
-	return getpass(prompt.c_str());
-}
+Utils utils(options);
 
 //----------------------------------------------------------------------------
 // Summary: Get the computer name
@@ -166,7 +156,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	vector<string> args = mkArgs(argc, argv);
+	vector<string> args = utils.mkArgs(argc, argv);
 
 	string newuser(argv[1]);
 
@@ -177,7 +167,7 @@ int main(int argc, char **argv)
 
 	ostringstream prompt;
 	prompt << "Enter PIN for new user " << newuser;
-	string password = getPassword(prompt.str());
+	string password = utils.getPassword(prompt.str());
 
 	try {
 		char secretbytes[64];

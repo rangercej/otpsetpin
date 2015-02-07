@@ -27,10 +27,6 @@ THE SOFTWARE.
 
 #include <cstdlib>
 
-extern "C" {
-	#include <unistd.h>
-	#include <pwd.h>
-}
 
 #include "utils.h"
 #include "options.h"
@@ -39,107 +35,11 @@ using namespace std;
 
 const string ErrNoPin = "NOPIN";
 
-enum ReturnCodes {
-	RcOkay = 0,
-	RcErr,
-	RcErrNoOtp,
-	RcErrPinMismatch,
-	RcErrBadPin,
-	RcErrFileError
-};
+const int RcOkay = 0;
+const int RcError = 1;
 	
 Options options;
-
-//----------------------------------------------------------------------------
-// Summary: user in system authentication database (/etc/passwd)
-// Returns: true or false
-bool isUserKnownToSystem(string username)
-{
-	if (username == "") {
-		return false;
-	}
-
-	if(getpwnam(username.c_str()) == NULL) {
-		return false;
-	} else {
-		return true;
-	} 
-}
-
-//----------------------------------------------------------------------------
-// Summary: get and validate a user-supplied user ID
-// Returns: passed in username
-string getUser(string user)
-{
-	int euid = geteuid();
-	if (euid != 0) {
-		throw "Cannot change another user's PIN";
-	}
-
-	if (!isUserKnownToSystem(user)) {
-		stringstream err;
-		err << "User not known: " << user;
-		throw err.str();
-	}
-
-	return user;
-}
-
-//----------------------------------------------------------------------------
-// Summary: Get the current login
-// Returns: current login ID
-string getCurrentUser()
-{
-	int uid = geteuid();
-
-	struct passwd *userData = getpwuid(uid);
-	if (userData == NULL) {
-		throw "Could not determine current user";
-	}
-
-	return string(userData->pw_name);
-}
-
-//----------------------------------------------------------------------------
-// Summary: Get a password/PIN from the terminal
-// Params:
-//     prompt - The prompt to display to the user
-// Returns: User entered password.
-string getPassword(string prompt)
-{
-	prompt.append(": ");
-	return getpass(prompt.c_str());
-}
-
-//----------------------------------------------------------------------------
-// Summary: Fetch a user's current PIN from the authorisation file
-// Params:
-//     user - The prompt to display to the user
-// Returns: PIN in the auth file
-string getCurrentPin (string user)
-{
-	ifstream authFile(options.DefaultAuthFile.c_str());
-	string type;
-	string userin;
-	string pin, temp;
-	
-	while (authFile >> type >> userin >> pin >> temp)
-	{
-		if (userin == user) {
-			if (pin.compare("-") == 0) {
-				return "";
-			} else {
-				return pin;
-			}
-
-			break;
-		}
-	}
-
-	stringstream err;
-	err << "User not configured for OTP: " << user;
-	throw err.str();
-}
+Utils utils(options);
 
 //----------------------------------------------------------------------------
 // Summary: Update the PIN for the user in the auth file (or add the user if
@@ -189,33 +89,25 @@ void savePin (string user, string newpin)
 // Returns: program exit code
 int main(int argc, char **argv)
 {
-	vector<string> args = mkArgs(argc, argv);
+	vector<string> args = utils.mkArgs(argc, argv);
 
 	string user;
 	try {
 		if (args.size() > 1) {
-			user = getUser(args[1]);
+			user = utils.getUser(args[1]);
 		} else {
-			user = getCurrentUser();
+			user = utils.getCurrentUser();
 		}
 	
-		string currentPin = getCurrentPin(user);
-
-		ostringstream prompt;
-		prompt << "Enter existing PIN for " << user;
-		string password = getPassword(prompt.str());
-	
-		if (password != currentPin) {
-			cout << "Invalid PIN." << endl;
-			return RcErrBadPin;
+		if (utils.validateUserPin(user)) {
+			throw "Invalid PIN.";
 		}
 	
-		string newpin1 = getPassword("Enter new PIN");
-		string newpin2 = getPassword("Enter new PIN again");
+		string newpin1 = utils.getPassword("Enter new PIN");
+		string newpin2 = utils.getPassword("Enter new PIN again");
 	
 		if (newpin1 != newpin2) {
-			cout << "PINs do not match";
-			return RcErrPinMismatch;
+			throw "PINs do not match.";
 		}
 	
 		savePin(user, newpin2);
@@ -228,4 +120,6 @@ int main(int argc, char **argv)
 	catch (string msg) {
 		cerr << msg << endl;
 	}
+
+	return RcError;
 }

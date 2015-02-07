@@ -24,9 +24,25 @@ THE SOFTWARE.
 #define __OTP_UTILS_H_
 
 #include <vector>
+#include "options.h"
 
 #define SECRETLENGTH	32
 
-std::vector<std::string> mkArgs(int, char **);
+class Utils
+{
+	private:
+		Options options;
+
+	public:
+		Utils(const Options & options);
+
+		std::vector<std::string> mkArgs (int argc, char **argv);
+		std::string getPassword(std::string prompt);
+		bool validateUserPin(std::string user);
+		bool isUserKnownToSystem(std::string username);
+		std::string getUser(std::string user);
+		std::string getCurrentUser();
+		std::string getCurrentPin (std::string user);
+};
 
 #endif
