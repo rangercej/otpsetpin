@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 		getSecret(secretbytes);
 		string secret = Utils::toHex(secretbytes);
 
-		UserInfo userinfo(newuser, options.DefaultAuthFile);
+		UserInfo userinfo(newuser, options);
 		userinfo.Mode = "HOTP/T30";
 		userinfo.PinNumber = password;
 		userinfo.Secret = secret;

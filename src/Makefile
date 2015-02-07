@@ -640,10 +640,10 @@ userinfo.o: userinfo.cpp /usr/include/stdc-predef.h \
  /usr/include/i386-linux-gnu/c++/4.9/bits/basic_file.h \
  /usr/include/i386-linux-gnu/c++/4.9/bits/c++io.h \
  /usr/include/c++/4.9/bits/fstream.tcc /usr/include/c++/4.9/iostream \
- userinfo.h utils.h /usr/include/c++/4.9/vector \
+ userinfo.h options.h /usr/include/c++/4.9/vector \
  /usr/include/c++/4.9/bits/stl_construct.h \
  /usr/include/c++/4.9/ext/alloc_traits.h \
  /usr/include/c++/4.9/bits/stl_uninitialized.h \
  /usr/include/c++/4.9/bits/stl_vector.h \
  /usr/include/c++/4.9/bits/stl_bvector.h \
- /usr/include/c++/4.9/bits/vector.tcc options.h
+ /usr/include/c++/4.9/bits/vector.tcc utils.h

@@ -78,7 +78,7 @@ void Options::ReadOptions()
 		string value = trim(parts[1]);
 		if (property == "otplength") {
 			int val = atoi(trim(value).c_str());
-			if (val != 6 || val != 8) {
+			if (val != 6 && val != 8) {
 				throw "'otplength' must either be 6 or 8";
 			}
 			Digits = val;

@@ -22,10 +22,13 @@ THE SOFTWARE.
 #ifndef __OTP_USERINFO_H_
 #define __OTP_USERINFO_H_
 
+#include "options.h"
+
 class UserInfo {
 
 	private:
 		std::string AuthFileName;
+		Options OtpOptions;
 
 	public:
 		std::string UserId;
@@ -33,7 +36,7 @@ class UserInfo {
 		std::string Mode;
 		std::string Secret;
 
-	UserInfo(std::string userId, std::string authFileName);
+	UserInfo(std::string userId, Options & options);
 	void Get();
 	void Update();
 	void Create();

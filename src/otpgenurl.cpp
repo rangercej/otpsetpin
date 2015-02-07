@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 			user = Utils::getCurrentUser();
 		}
 
-		UserInfo userinfo(user, options.DefaultAuthFile);
+		UserInfo userinfo(user, options);
 	
 		if (!Utils::runningAsRoot()) {
 			if (!Utils::validateUserPin(userinfo)) {

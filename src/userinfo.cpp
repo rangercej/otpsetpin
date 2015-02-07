@@ -26,12 +26,14 @@ THE SOFTWARE.
 
 #include "userinfo.h"
 #include "utils.h"
+#include "options.h"
 
 using namespace std;
 
-UserInfo::UserInfo(string userId, string authFileName)
+UserInfo::UserInfo(string userId, Options & options)
 {
-	AuthFileName = authFileName;
+	OtpOptions = options;
+	AuthFileName = options.DefaultAuthFile;
 	UserId = userId;
 	Mode = "";
 	PinNumber = "";
@@ -137,7 +139,7 @@ void UserInfo::Create()
 string UserInfo::GetUrl()
 {
 	stringstream url;
-	url << "otppath://totp/otpsetpin:" << UserId << "?secret=" << Utils::hexToBase32(Secret);
+	url << "otppath://totp/" << OtpOptions.Issuer << ":" << UserId << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.Digits;
 
 	return url.str();
 }
