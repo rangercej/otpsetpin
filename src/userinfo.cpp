@@ -56,7 +56,6 @@ void UserInfo::Get()
 	}
 
 	while (authFile >> type >> userin >> pin >> secret && getline(authFile, temp)) {
-		cout << UserId << "|" << userin  << endl;
 		if (userin == UserId) {
 			Mode = type;
 			PinNumber = pin;
@@ -138,7 +137,7 @@ void UserInfo::Create()
 string UserInfo::GetUrl()
 {
 	stringstream url;
-	url << "otppath://totp/otpsetpin:" << UserId << "?secret=" << Utils::hexToBase32(Secret) << endl;
+	url << "otppath://totp/otpsetpin:" << UserId << "?secret=" << Utils::hexToBase32(Secret);
 
 	return url.str();
 }

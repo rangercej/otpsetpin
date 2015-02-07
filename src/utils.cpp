@@ -117,7 +117,7 @@ string Utils::getUser(string user)
 {
 	int uid = getuid();
 	if (uid != 0) {
-		throw "Cannot change another user's PIN";
+		throw "Permission denied.";
 	}
 
 	if (!isUserKnownToSystem(user)) {

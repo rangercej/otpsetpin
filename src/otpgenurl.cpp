@@ -24,49 +24,26 @@ THE SOFTWARE.
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include <iomanip>
-#include <iterator>
-#include <algorithm>
 
-#include <unistd.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 extern "C" {
-#include <liboath/oath.h>
+	#include <unistd.h>
+	#include <pwd.h>
 }
 
 #include "utils.h"
 #include "options.h"
+#include "userinfo.h"
 
 using namespace std;
 
+const string ErrNoPin = "NOPIN";
+
+const int RcOkay = 0;
+const int RcError = 1;
+
 Options options;
-
-//----------------------------------------------------------------------------
-// Summary: Get the computer name
-// Params: none
-// Returns: computer name, or UNKNOWN on error
-string getHostName()
-{
-	char hostBuffer[256];
-	int result = gethostname(hostBuffer, sizeof(hostBuffer));
-	if (result == -1) {
-		return "[UNKNOWN]";
-	} else {
-		return hostBuffer;
-	}
-}
-
-//----------------------------------------------------------------------------
-// Summary: Get a secret for a user
-// Params: none
-// Returns: The secret to use
-void getSecret(char *target)
-{
-	char *p = (char*)target;
-	fstream randomStream("/dev/urandom");
-	randomStream.read(p, SECRETLENGTH);
-}
 
 //----------------------------------------------------------------------------
 // Summary: Program entry point
@@ -76,48 +53,33 @@ void getSecret(char *target)
 // Returns: program exit code
 int main(int argc, char **argv)
 {
-	if (argc == 0) {
-		cout << "Syntax: otpadduser {user}" << endl;
-		return 1;
-	}
-
 	vector<string> args = Utils::mkArgs(argc, argv);
 
-	string newuser(argv[1]);
-
-	if (newuser == "") {
-		cout << "No user provided.";
-		return 1;
-	}
-
-	ostringstream prompt;
-	prompt << "Enter PIN for new user " << newuser;
-	string password = Utils::getPassword(prompt.str());
-
+	string user;
 	try {
-		char secretbytes[64];
-		getSecret(secretbytes);
-		string secret = Utils::toHex(secretbytes);
+		if (args.size() > 1) {
+			user = Utils::getUser(args[1]);
+		} else {
+			user = Utils::getCurrentUser();
+		}
 
-		UserInfo userinfo(newuser, options.DefaultAuthFile);
-		userinfo.Mode = "HOTP/T30";
-		userinfo.PinNumber = password;
-		userinfo.Secret = secret;
-		userinfo.Create();
+		UserInfo userinfo(user, options.DefaultAuthFile);
+	
+		if (!Utils::runningAsRoot()) {
+			if (!Utils::validateUserPin(userinfo)) {
+				throw "Invalid PIN.";
+			}
+		}
 
-		// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
-		cout << "User added. URL for QR is:" << endl;
 		cout << userinfo.GetUrl() << endl;
-		//cout << "otpauth://totp/otpsetpin:" << newuser << "@" << getHostName() << "?secret=" << toBase32(secretbytes) << endl;
+		return RcOkay;
 	}
-	catch (const char* msg)
-	{
-		cerr << "ERROR: " << msg << endl;
+	catch (const char *msg) {
+		cerr << msg << endl;
 	}
-	catch (string msg)
-	{
-		cerr << "ERROR: " << msg << endl;
+	catch (string msg) {
+		cerr << msg << endl;
 	}
 
-	return 0;
+	return RcError;
 }
