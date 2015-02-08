@@ -72,7 +72,7 @@ std::string Utils::getPassword(const std::string & prompt)
 {
 	std::string s = prompt;
 	s.append(": ");
-	return getpass(prompt.c_str());
+	return getpass(s.c_str());
 }
 
 //----------------------------------------------------------------------------
