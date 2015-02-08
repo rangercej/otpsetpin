@@ -29,6 +29,9 @@ class OtpError
 		int IntContext;
 		std::string StringContext;
 
+		bool HaveIntContext;
+		bool HaveStringContext;
+
 	public:
 		struct ErrorCodes {
 			enum Codes {

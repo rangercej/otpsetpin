@@ -800,4 +800,20 @@ otperror.o: otperror.cpp /usr/include/stdc-predef.h \
  /usr/include/i386-linux-gnu/bits/pthreadtypes.h \
  /usr/include/i386-linux-gnu/bits/setjmp.h \
  /usr/include/i386-linux-gnu/c++/4.9/bits/atomic_word.h \
- /usr/include/c++/4.9/bits/basic_string.tcc otperror.h
+ /usr/include/c++/4.9/bits/basic_string.tcc /usr/include/c++/4.9/sstream \
+ /usr/include/c++/4.9/istream /usr/include/c++/4.9/ios \
+ /usr/include/c++/4.9/bits/ios_base.h \
+ /usr/include/c++/4.9/bits/locale_classes.h \
+ /usr/include/c++/4.9/bits/locale_classes.tcc \
+ /usr/include/c++/4.9/streambuf /usr/include/c++/4.9/bits/streambuf.tcc \
+ /usr/include/c++/4.9/bits/basic_ios.h \
+ /usr/include/c++/4.9/bits/locale_facets.h /usr/include/c++/4.9/cwctype \
+ /usr/include/wctype.h \
+ /usr/include/i386-linux-gnu/c++/4.9/bits/ctype_base.h \
+ /usr/include/c++/4.9/bits/streambuf_iterator.h \
+ /usr/include/i386-linux-gnu/c++/4.9/bits/ctype_inline.h \
+ /usr/include/c++/4.9/bits/locale_facets.tcc \
+ /usr/include/c++/4.9/bits/basic_ios.tcc /usr/include/c++/4.9/ostream \
+ /usr/include/c++/4.9/bits/ostream.tcc \
+ /usr/include/c++/4.9/bits/istream.tcc \
+ /usr/include/c++/4.9/bits/sstream.tcc otperror.h

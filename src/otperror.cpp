@@ -20,55 +20,89 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
 #include <string>
+#include <sstream>
+
 #include "otperror.h"
 
 OtpError::OtpError(int errorCode)
 {
 	ErrorType = errorCode;
+	HaveIntContext = false;
+	HaveStringContext = false;
 }
 
 OtpError::OtpError(int errorCode, int context)
 {
 	ErrorType = errorCode;
 	IntContext = context;
+	HaveIntContext = true;
+	HaveStringContext = false;
 }
 
 OtpError::OtpError(int errorCode, std::string context)
 {
 	ErrorType = errorCode;
 	StringContext = context;
+	HaveIntContext = false;
+	HaveStringContext = true;
 }
 
 std::string OtpError::GetMessage() const
 {
+	std::ostringstream errorText;
+
 	switch (ErrorType) {
 		case ErrorCodes::NoError:
-			return "No error.";
+			errorText << "No error";
+			break;
 		case ErrorCodes::PinMismatch:
-			return "PINs do not match.";
+			errorText << "PINs do not match";
+			break;
 		case ErrorCodes::AuthFileReadError:
-			return "Could not open auth file for reading.";
+			errorText <<  "Could not open auth file for reading";
+			break;
 		case ErrorCodes::AuthFileWriteError:
-			return "Could not open auth file for writing.";
+			errorText <<  "Could not open auth file for writing";
+			break;
 		case ErrorCodes::UserWriteError:
-			return "Unexpected failure to update auth file for user.";
+			errorText <<  "Unexpected failure to update auth file for user";
+			break;
 		case ErrorCodes::IncorrectPin:
-			return "Incorrect PIN.";
+			errorText <<  "Incorrect PIN";
+			break;
 		case ErrorCodes::UnknownUser:
-			return "Unknown user provided.";
+			errorText <<  "Unknown user provided";
+			break;
 		case ErrorCodes::PermissionDenied:
-			return "Permission denied";
+			errorText <<  "Permission denied";
+			break;
 		case ErrorCodes::ConversionError:
-			return "Error converting hex string";
+			errorText <<  "Error converting hex string";
+			break;
 		case ErrorCodes::CannotDetermineUser:
-			return "Unable to determine current user.";
+			errorText <<  "Unable to determine current user";
+			break;
 		case ErrorCodes::ConfBadOtpLength:
-			return "'otplength' must either be '6' or '8'.";
+			errorText <<  "'otplength' must either be '6' or '8'";
+			break;
 		case ErrorCodes::ConfUnknownDirective:
-			return "Unknown configuration directive.";
+			errorText <<  "Unknown configuration directive";
+			break;
 		default:
-			return "Unknown error";
+			errorText <<  "Unknown error:" << ErrorType;
 	}
+
+	if (HaveStringContext) {
+		errorText << ": " << StringContext;
+	}
+
+	if (HaveIntContext) {
+		errorText << ": " << IntContext;
+	}
+
+	errorText << ".";
+
+	return errorText.str();
 }
 
 int OtpError::GetErrorCode() const
