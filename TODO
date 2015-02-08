@@ -1,0 +1,2 @@
+* More flexibility? Support 60s interval (HOTP/T60)
+* Should the tool support HOTP as well as TOTP?
