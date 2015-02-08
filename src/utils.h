@@ -36,15 +36,15 @@ class Utils
 
 		static bool runningAsRoot();
 		static std::vector<std::string> mkArgs (int argc, char **argv);
-		static std::string getPassword(std::string prompt);
-		static bool validateUserPin(UserInfo & user);
-		static bool isUserKnownToSystem(std::string username);
-		static std::string getUser(std::string user);
+		static std::string getPassword(const std::string & prompt);
+		static bool validateUserPin(const UserInfo & user);
+		static bool isUserKnownToSystem(const std::string & username);
+		static std::string getUser(const std::string & user);
 		static std::string getCurrentUser();
 
-		static std::string toHex(char *bytes);
-		static std::string toBase32(char *bytes);
-		static std::string hexToBase32(std::string hexString);
+		static std::string toHex(const char *bytes);
+		static std::string toBase32(const char *bytes);
+		static std::string hexToBase32(const std::string & hexString);
 };
 
 #endif

@@ -39,7 +39,7 @@ Options::Options()
 	ReadOptions();
 }
 
-Options::Options(string configFile)
+Options::Options(const string & configFile)
 {
 	SetDefaults();
 	ConfigFile = configFile;

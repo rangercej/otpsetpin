@@ -70,9 +70,10 @@ bool Utils::runningAsRoot()
 // Params:
 //     prompt - The prompt to display to the user
 // Returns: User entered password.
-string Utils::getPassword(string prompt)
+string Utils::getPassword(const string & prompt)
 {
-	prompt.append(": ");
+	string s = prompt;
+	s.append(": ");
 	return getpass(prompt.c_str());
 }
 
@@ -81,7 +82,7 @@ string Utils::getPassword(string prompt)
 // Params:
 //	user - User whose PIN to fetch and validate against current PIN
 // Returns: true on success
-bool Utils::validateUserPin(UserInfo & userinfo)
+bool Utils::validateUserPin(const UserInfo & userinfo)
 {
 	ostringstream prompt;
 	prompt << "Enter existing PIN for " << userinfo.UserId;
@@ -97,7 +98,7 @@ bool Utils::validateUserPin(UserInfo & userinfo)
 //----------------------------------------------------------------------------
 // Summary: user in system authentication database (/etc/passwd)
 // Returns: true or false
-bool Utils::isUserKnownToSystem(string username)
+bool Utils::isUserKnownToSystem(const string & username)
 {
 	if (username == "") {
 		return false;
@@ -113,7 +114,7 @@ bool Utils::isUserKnownToSystem(string username)
 //----------------------------------------------------------------------------
 // Summary: get and validate a user-supplied user ID
 // Returns: passed in username
-string Utils::getUser(string user)
+string Utils::getUser(const string & user)
 {
 	int uid = getuid();
 	if (uid != 0) {
@@ -148,7 +149,7 @@ string Utils::getCurrentUser()
 // Summary: Convert bytes to a hex string
 // Params: Secret to convert
 // Returns: Hex version of the secret
-string Utils::toHex(char *secret)
+string Utils::toHex(const char *secret)
 {
 	char hexBuffer[1024];
 	oath_bin2hex(secret, SECRETLENGTH, hexBuffer);
@@ -160,7 +161,7 @@ string Utils::toHex(char *secret)
 // Summary: Convert bytes to a base32 string
 // Params: Secret to convert as a hex string
 // Returns: Base32 version of the secret
-string Utils::toBase32(char *secret)
+string Utils::toBase32(const char *secret)
 {
 	char *b32Buffer;
 	size_t b32Length;
@@ -176,7 +177,7 @@ string Utils::toBase32(char *secret)
 // Summary: Convert hexstring to a base32 string
 // Params: Hex string to convert
 // Returns: Base32 version of the string
-string Utils::hexToBase32(string hexString)
+string Utils::hexToBase32(const string & hexString)
 {
 	char bytes[128];
 	size_t byteLen = sizeof(bytes);

@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 using namespace std;
 
-UserInfo::UserInfo(string userId, Options & options)
+UserInfo::UserInfo(const string & userId, const Options & options)
 {
 	OtpOptions = options;
 	AuthFileName = options.DefaultAuthFile;

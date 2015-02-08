@@ -36,7 +36,7 @@ class UserInfo {
 		std::string Mode;
 		std::string Secret;
 
-	UserInfo(std::string userId, Options & options);
+	UserInfo(const std::string & userId, const Options & options);
 	void Get();
 	void Update();
 	void Create();

@@ -46,7 +46,7 @@ class Options
 		int Digits;
 
 		Options();
-		Options(std::string configFile);
+		Options(const std::string & configFile);
 };
 
 #endif
