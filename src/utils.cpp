@@ -34,6 +34,7 @@ extern "C" {
 
 #include "utils.h"
 #include "userinfo.h"
+#include "otperror.h"
 
 //----------------------------------------------------------------------------
 Utils::Utils()
@@ -116,13 +117,11 @@ std::string Utils::getUser(const std::string & user)
 {
 	int uid = getuid();
 	if (uid != 0) {
-		throw "Permission denied.";
+		throw OtpError(OtpError::ErrorCodes::PermissionDenied);
 	}
 
 	if (!isUserKnownToSystem(user)) {
-		std::stringstream err;
-		err << "User not known: " << user;
-		throw err.str();
+		throw OtpError(OtpError::ErrorCodes::UnknownUser, user);
 	}
 
 	return user;
@@ -137,7 +136,7 @@ std::string Utils::getCurrentUser()
 
 	struct passwd *userData = getpwuid(uid);
 	if (userData == NULL) {
-		throw "Could not determine current user";
+		throw OtpError(OtpError::ErrorCodes::CannotDetermineUser);
 	}
 
 	return std::string(userData->pw_name);
@@ -182,9 +181,7 @@ std::string Utils::hexToBase32(const std::string & hexString)
 	int ok = oath_hex2bin (hexString.c_str(), bytes, &byteLen);
 
 	if (ok != OATH_OK) {
-		std::stringstream err;
-		err << "Erro converting hex string: " << ok;
-		throw err.str();
+		throw OtpError(OtpError::ErrorCodes::ConversionError, ok);
 	}
 
 	return toBase32(bytes);

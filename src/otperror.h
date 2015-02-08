@@ -19,55 +19,40 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
+#ifndef __OTP_OTPERROR_H_
+#define __OTP_OTPERROR_H_
 
-#include <iostream>
-#include <sstream>
-#include <vector>
-
-#include <cstdlib>
-
-extern "C" {
-	#include <unistd.h>
-	#include <liboath/oath.h>
-}
-
-#include "utils.h"
-#include "options.h"
-#include "otperror.h"
-
-Options options;
-
-//----------------------------------------------------------------------------
-// Summary: Program entry point
-// Params:
-//     argc - Count of command line parameters
-//     argv - Command line parameters
-// Returns: program exit code
-int main(int argc, char **argv)
+class OtpError
 {
-	if (argc == 1) {
-		std::cout << "Syntax: otpdeluser {user}" << std::endl;
-		return 1;
-	}
+	private:
+		int ErrorType;
+		int IntContext;
+		std::string StringContext;
 
-	std::vector<std::string> args = Utils::mkArgs(argc, argv);
+	public:
+		struct ErrorCodes {
+			enum Codes {
+				NoError = 0,
+				PinMismatch,
+				AuthFileReadError,
+				AuthFileWriteError,
+				UserWriteError,
+				IncorrectPin,
+				UnknownUser,
+				PermissionDenied,
+				ConversionError,
+				CannotDetermineUser,
+				ConfBadOtpLength,
+				ConfUnknownDirective
+			};
+		};
 
-	std::string deluser(argv[1]);
+		OtpError (int errorType);
+		OtpError (int errorType, int context);
+		OtpError (int errorType, std::string context);
 
-	if (deluser == "") {
-		std::cout << "No user provided." << std::endl;
-		return 1;
-	}
+		std::string GetMessage() const;
+		int GetErrorCode() const;;
+};
 
-	try {
-		UserInfo userinfo(deluser, options);
-		userinfo.Delete();
-	}
-	catch (OtpError err)
-	{
-		std::cerr << "ERROR: " << err.GetMessage() << std::endl;
-		return err.GetErrorCode();
-	}
-
-	return 0;
-}
+#endif

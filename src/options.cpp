@@ -20,8 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
 
-#include "options.h"
-
 #include <string>
 #include <vector>
 #include <fstream>
@@ -30,6 +28,10 @@ THE SOFTWARE.
 #include <iostream>
 
 #include <cstdlib>
+
+#include "options.h"
+#include "otperror.h"
+
 
 Options::Options()
 {
@@ -77,7 +79,7 @@ void Options::ReadOptions()
 		if (property == "otplength") {
 			int val = atoi(trim(value).c_str());
 			if (val != 6 && val != 8) {
-				throw "'otplength' must either be 6 or 8";
+				throw OtpError(OtpError::ErrorCodes::ConfBadOtpLength);
 			}
 			Digits = val;
 		} else if (property == "issuer") {
@@ -85,7 +87,7 @@ void Options::ReadOptions()
 		} else if (property == "authfile") {
 			DefaultAuthFile = value;
 		} else {
-			throw "Unknown configuration directive";
+			throw OtpError(OtpError::ErrorCodes::ConfUnknownDirective);
 		}
 	}
 }

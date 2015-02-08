@@ -34,9 +34,7 @@ extern "C" {
 #include "utils.h"
 #include "options.h"
 #include "userinfo.h"
-
-const int RcOkay = 0;
-const int RcError = 1;
+#include "otperror.h"
 
 Options options;
 
@@ -62,19 +60,16 @@ int main(int argc, char **argv)
 	
 		if (!Utils::runningAsRoot()) {
 			if (!Utils::validateUserPin(userinfo)) {
-				throw "Invalid PIN.";
+				throw OtpError(OtpError::ErrorCodes::IncorrectPin);
 			}
 		}
 
 		std::cout << userinfo.GetUrl() << std::endl;
-		return RcOkay;
 	}
-	catch (const char *msg) {
-		std::cerr << msg << std::endl;
-	}
-	catch (std::string msg) {
-		std::cerr << msg << std::endl;
+	catch (OtpError err) {
+		std::cerr << err.GetMessage() << std::endl;
+		return err.GetErrorCode();
 	}
 
-	return RcError;
+	return 0;
 }

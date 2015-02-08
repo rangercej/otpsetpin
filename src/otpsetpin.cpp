@@ -29,10 +29,8 @@ THE SOFTWARE.
 #include "utils.h"
 #include "options.h"
 #include "userinfo.h"
+#include "otperror.h"
 
-const int RcOkay = 0;
-const int RcError = 1;
-	
 Options options;
 
 //----------------------------------------------------------------------------
@@ -57,7 +55,7 @@ int main(int argc, char **argv)
 
 		if (!Utils::runningAsRoot()) {
 			if (!Utils::validateUserPin(userinfo)) {
-				throw "Invalid PIN.";
+				throw OtpError(OtpError::ErrorCodes::IncorrectPin);
 			}
 		}
 	
@@ -65,20 +63,16 @@ int main(int argc, char **argv)
 		std::string newpin2 = Utils::getPassword("Enter new PIN again");
 	
 		if (newpin1 != newpin2) {
-			throw "PINs do not match.";
+			throw OtpError(OtpError::ErrorCodes::PinMismatch);
 		}
 	
 		userinfo.SetPinNumber(newpin2);
 		userinfo.Update();
-		
-		return RcOkay;
 	}
-	catch (const char *msg) {
-		std::cerr << msg << std::endl;
-	}
-	catch (std::string msg) {
-		std::cerr << msg << std::endl;
+	catch (OtpError err) {
+		std::cerr << err.GetMessage() << std::endl;
+		return err.GetErrorCode();
 	}
 
-	return RcError;
+	return 0;
 }
