@@ -29,6 +29,16 @@ otpgenurl: otpgenurl.o $(LIBOBJ)
 clean:
 	rm -f *.o $(TARGETS)
 
+install:
+	install --mode=4711 --owner=root otpsetpin /usr/local/bin
+	install --mode=4711 --owner=root otpgenurl /usr/local/bin
+	install --mode=0711 --owner=root otpadduser /usr/local/bin
+	install --mode=0711 --owner=root otpdeluser /usr/local/bin
+	install --mode=0600 --owner=root ../options.oath.sample /etc/options.oath
+	touch /etc/users.oath
+	chmod 600 /etc/users.oath
+	chown root /etc/users.oath
+
 # DO NOT DELETE
 otpsetpin.o: otpsetpin.cpp /usr/include/stdc-predef.h \
  /usr/include/c++/4.9/iostream \

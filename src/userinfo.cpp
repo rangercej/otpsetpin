@@ -146,7 +146,7 @@ void UserInfo::UpdateUserFile(int userAction)
 std::string UserInfo::GetUrl() const
 {
 	std::stringstream url;
-	url << "otppath://totp/" << OtpOptions.Issuer << ":" << UserId << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.Digits;
+	url << "otppath://totp/" << OtpOptions.Issuer << ":" << UserId << "@" << Utils::getHostName() << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.Digits;
 
 	return url.str();
 }

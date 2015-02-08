@@ -189,3 +189,18 @@ std::string Utils::hexToBase32(const std::string & hexString)
 
 	return toBase32(bytes);
 }
+
+//----------------------------------------------------------------------------
+// Summary: Get the computer name
+// Params: none
+// Returns: computer name, or UNKNOWN on error
+std::string Utils::getHostName()
+{
+	char hostBuffer[256];
+	int result = gethostname(hostBuffer, sizeof(hostBuffer));
+	if (result == -1) {
+		return "[UNKNOWN]";
+	} else {
+		return hostBuffer;
+	}
+}

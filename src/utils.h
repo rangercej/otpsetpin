@@ -41,6 +41,7 @@ class Utils
 		static bool isUserKnownToSystem(const std::string & username);
 		static std::string getUser(const std::string & user);
 		static std::string getCurrentUser();
+		static std::string getHostName();
 
 		static std::string toHex(const char *bytes);
 		static std::string toBase32(const char *bytes);

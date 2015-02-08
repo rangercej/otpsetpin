@@ -38,21 +38,6 @@ extern "C" {
 Options options;
 
 //----------------------------------------------------------------------------
-// Summary: Get the computer name
-// Params: none
-// Returns: computer name, or UNKNOWN on error
-std::string getHostName()
-{
-	char hostBuffer[256];
-	int result = gethostname(hostBuffer, sizeof(hostBuffer));
-	if (result == -1) {
-		return "[UNKNOWN]";
-	} else {
-		return hostBuffer;
-	}
-}
-
-//----------------------------------------------------------------------------
 // Summary: Get a secret for a user
 // Params: none
 // Returns: The secret to use
