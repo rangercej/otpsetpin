@@ -64,6 +64,9 @@ std::string OtpError::GetMessage() const
 		case ErrorCodes::AuthFileWriteError:
 			errorText <<  "Could not open auth file for writing";
 			break;
+		case ErrorCodes::AuthFilePermsError:
+			errorText <<  "Failed to set permissions for auth file";
+			break;
 		case ErrorCodes::UserWriteError:
 			errorText <<  "Unexpected failure to update auth file for user";
 			break;

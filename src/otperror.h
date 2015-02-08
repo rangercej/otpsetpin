@@ -39,6 +39,7 @@ class OtpError
 				PinMismatch,
 				AuthFileReadError,
 				AuthFileWriteError,
+				AuthFilePermsError,
 				UserWriteError,
 				IncorrectPin,
 				UnknownUser,

@@ -731,8 +731,9 @@ userinfo.o: userinfo.cpp /usr/include/stdc-predef.h \
  /usr/include/i386-linux-gnu/c++/4.9/bits/basic_file.h \
  /usr/include/i386-linux-gnu/c++/4.9/bits/c++io.h \
  /usr/include/c++/4.9/bits/fstream.tcc /usr/include/c++/4.9/iostream \
- userinfo.h options.h /usr/include/c++/4.9/vector \
- /usr/include/c++/4.9/bits/stl_construct.h \
+ /usr/include/i386-linux-gnu/sys/stat.h \
+ /usr/include/i386-linux-gnu/bits/stat.h userinfo.h options.h \
+ /usr/include/c++/4.9/vector /usr/include/c++/4.9/bits/stl_construct.h \
  /usr/include/c++/4.9/ext/alloc_traits.h \
  /usr/include/c++/4.9/bits/stl_uninitialized.h \
  /usr/include/c++/4.9/bits/stl_vector.h \
