@@ -100,15 +100,12 @@ int main(int argc, char **argv)
 		string secret = Utils::toHex(secretbytes);
 
 		UserInfo userinfo(newuser, options);
-		userinfo.Mode = "HOTP/T30";
-		userinfo.PinNumber = password;
-		userinfo.Secret = secret;
+		userinfo.SetMode("HOTP/T30").SetPinNumber(password).SetSecret(secret);
 		userinfo.Create();
 
 		// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
 		cout << "User added. URL for QR is:" << endl;
 		cout << userinfo.GetUrl() << endl;
-		//cout << "otpauth://totp/otpsetpin:" << newuser << "@" << getHostName() << "?secret=" << toBase32(secretbytes) << endl;
 	}
 	catch (const char* msg)
 	{

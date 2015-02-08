@@ -136,10 +136,52 @@ void UserInfo::Create()
 	::rename(tempFile.c_str(), AuthFileName.c_str());
 }
 
-string UserInfo::GetUrl()
+//----------------------------------------------------------------------------
+// Summary: Create OTP URL for use with QR code for FreeOTP
+// Params: none
+// Returns: otppath:// URL string
+string UserInfo::GetUrl() const
 {
 	stringstream url;
 	url << "otppath://totp/" << OtpOptions.Issuer << ":" << UserId << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.Digits;
 
 	return url.str();
+}
+
+UserInfo & UserInfo::SetPinNumber(const string & pin)
+{
+	PinNumber = pin;
+	return *this;
+}
+
+UserInfo & UserInfo::SetMode(const string & mode)
+{
+	Mode = mode;
+	return *this;
+}
+
+UserInfo & UserInfo::SetSecret(const string & secret)
+{
+	Secret = secret;
+	return *this;
+}
+
+string UserInfo::GetPinNumber() const
+{
+	return PinNumber;
+}
+
+string UserInfo::GetMode() const
+{
+	return Mode;
+}
+
+string UserInfo::GetSecret() const
+{
+	return Secret;
+}
+
+string UserInfo::GetUserId() const
+{
+	return UserId;
 }

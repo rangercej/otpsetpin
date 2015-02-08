@@ -85,10 +85,10 @@ string Utils::getPassword(const string & prompt)
 bool Utils::validateUserPin(const UserInfo & userinfo)
 {
 	ostringstream prompt;
-	prompt << "Enter existing PIN for " << userinfo.UserId;
+	prompt << "Enter existing PIN for " << userinfo.GetUserId();
 	string password = getPassword(prompt.str());
 
-	if (password != userinfo.PinNumber) {
+	if (password != userinfo.GetPinNumber()) {
 		return false;
 	}
 

@@ -30,17 +30,27 @@ class UserInfo {
 		std::string AuthFileName;
 		Options OtpOptions;
 
-	public:
 		std::string UserId;
 		std::string PinNumber;
 		std::string Mode;
 		std::string Secret;
 
-	UserInfo(const std::string & userId, const Options & options);
-	void Get();
-	void Update();
-	void Create();
-	std::string GetUrl();
+		void Get();
+
+	public:
+		UserInfo(const std::string & userId, const Options & options);
+		void Update();
+		void Create();
+
+		UserInfo & SetPinNumber(const std::string &);
+		UserInfo & SetMode(const std::string &);
+		UserInfo & SetSecret(const std::string &);
+
+		std::string GetPinNumber() const;
+		std::string GetMode() const;
+		std::string GetSecret() const;
+		std::string GetUserId() const;
+		std::string GetUrl() const;
 };
 
 #endif

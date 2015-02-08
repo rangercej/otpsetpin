@@ -73,7 +73,7 @@ int main(int argc, char **argv)
 			throw "PINs do not match.";
 		}
 	
-		userinfo.PinNumber = newpin2;
+		userinfo.SetPinNumber(newpin2);
 		userinfo.Update();
 		
 		return RcOkay;
