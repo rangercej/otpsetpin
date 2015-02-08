@@ -44,7 +44,7 @@ Options options;
 // Returns: program exit code
 int main(int argc, char **argv)
 {
-	if (argc == 0) {
+	if (argc == 1) {
 		std::cout << "Syntax: otpdeluser {user}" << std::endl;
 		return 1;
 	}

@@ -71,7 +71,7 @@ void getSecret(char *target)
 // Returns: program exit code
 int main(int argc, char **argv)
 {
-	if (argc == 0) {
+	if (argc == 1) {
 		std::cout << "Syntax: otpadduser {user}" << std::endl;
 		return 1;
 	}
