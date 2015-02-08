@@ -60,6 +60,7 @@ void Options::ReadOptions()
 
 	if (configFile.fail()) {
 		std::cout << "Warning: could not find configuration file, using defaults" << std::endl;
+		IsInitialized = true;
 		return;
 	}
 
