@@ -19,33 +19,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
+#ifndef __OTP_USERINFO_H_
+#define __OTP_USERINFO_H_
 
-#ifndef __OTP_UTILS_H_
-#define __OTP_UTILS_H_
-
-#include <vector>
 #include "options.h"
-#include "userinfo.h"
 
-#define SECRETLENGTH	32
+class UserInfo {
 
-class Utils
-{
+	private:
+		struct UserAction {
+			enum Actions { Create, Update, Delete };
+		};
+
+		std::string AuthFileName;
+		Options OtpOptions;
+
+		std::string UserId;
+		std::string PinNumber;
+		std::string Mode;
+		std::string Secret;
+
+		void UpdateUserFile(int userAction);
+
+		void Get();
+
 	public:
-		Utils();
+		UserInfo(const std::string & userId, const Options & options);
+		void Update();
+		void Create();
+		void Delete();
 
-		static bool runningAsRoot();
-		static std::vector<std::string> mkArgs (int argc, char **argv);
-		static std::string getPassword(const std::string & prompt);
-		static bool validateUserPin(const UserInfo & user);
-		static bool isUserKnownToSystem(const std::string & username);
-		static std::string getUser(const std::string & user);
-		static std::string getCurrentUser();
-		static std::string getHostName();
+		UserInfo & SetPinNumber(const std::string &);
+		UserInfo & SetMode(const std::string &);
+		UserInfo & SetSecret(const std::string &);
 
-		static std::string toHex(const char *bytes);
-		static std::string toBase32(const char *bytes);
-		static std::string hexToBase32(const std::string & hexString);
+		std::string GetPinNumber() const;
+		std::string GetMode() const;
+		std::string GetSecret() const;
+		std::string GetUserId() const;
+		std::string GetUrl() const;
 };
 
 #endif
