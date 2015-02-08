@@ -27,11 +27,12 @@ THE SOFTWARE.
 #include "userinfo.h"
 #include "utils.h"
 #include "options.h"
+#include "otperror.h"
 
 UserInfo::UserInfo(const std::string & userId, const Options & options)
 {
 	OtpOptions = options;
-	AuthFileName = options.DefaultAuthFile;
+	AuthFileName = options.GetAuthFile();
 	UserId = userId;
 	Mode = "";
 	PinNumber = "";
@@ -52,7 +53,7 @@ void UserInfo::Get()
 	std::ifstream authFile(AuthFileName.c_str());
 	if (authFile.fail())
 	{
-		throw "Cannot open authorisation file.";
+		throw OtpError(OtpError::ErrorCodes::AuthFileReadError);
 	}
 
 	while (authFile >> type >> userin >> pin >> secret && std::getline(authFile, temp)) {
@@ -108,7 +109,7 @@ void UserInfo::UpdateUserFile(int userAction)
 		std::ifstream authFile(AuthFileName.c_str());
 		std::ofstream newAuthFile(tempFile.c_str());
 		if (newAuthFile.fail()) {
-			throw "Cannot open auth file for writing";
+			throw OtpError(OtpError::ErrorCodes::AuthFileWriteError);
 		}
 
 		while (authFile >> type >> userin >> pin >> secret && std::getline(authFile, temp)) {
@@ -129,11 +130,7 @@ void UserInfo::UpdateUserFile(int userAction)
 	}	
 
 	if (!userwrote) {
-		// We should never call this, but have it in just in case
-		// something happens (a race possibly?).
-		std::stringstream err;
-		err << "Error - failed to update user " << UserId;
-		throw err.str();
+		throw OtpError(OtpError::ErrorCodes::UserWriteError, UserId);
 	} else {
 		::rename(tempFile.c_str(), AuthFileName.c_str());
 	}
@@ -146,7 +143,7 @@ void UserInfo::UpdateUserFile(int userAction)
 std::string UserInfo::GetUrl() const
 {
 	std::stringstream url;
-	url << "otppath://totp/" << OtpOptions.Issuer << ":" << UserId << "@" << Utils::getHostName() << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.Digits;
+	url << "otppath://totp/" << OtpOptions.GetIssuer() << ":" << UserId << "@" << Utils::getHostName() << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.GetDigits();
 
 	return url.str();
 }

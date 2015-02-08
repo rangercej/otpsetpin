@@ -33,6 +33,7 @@ extern "C" {
 
 #include "utils.h"
 #include "options.h"
+#include "otperror.h"
 
 Options options;
 
@@ -59,16 +60,15 @@ int main(int argc, char **argv)
 	}
 
 	try {
+		options.ReadOptions();
+
 		UserInfo userinfo(deluser, options);
 		userinfo.Delete();
 	}
-	catch (const char* msg)
+	catch (OtpError err)
 	{
-		std::cerr << "ERROR: " << msg << std::endl;
-	}
-	catch (std::string msg)
-	{
-		std::cerr << "ERROR: " << msg << std::endl;
+		std::cerr << "ERROR: " << err.GetMessage() << std::endl;
+		return err.GetErrorCode();
 	}
 
 	return 0;

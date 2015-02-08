@@ -34,6 +34,7 @@ extern "C" {
 
 #include "utils.h"
 #include "options.h"
+#include "otperror.h"
 
 Options options;
 
@@ -70,11 +71,13 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	std::ostringstream prompt;
-	prompt << "Enter PIN for new user " << newuser;
-	std::string password = Utils::getPassword(prompt.str());
-
 	try {
+		options.ReadOptions();
+
+		std::ostringstream prompt;
+		prompt << "Enter PIN for new user " << newuser;
+		std::string password = Utils::getPassword(prompt.str());
+
 		char secretbytes[64];
 		getSecret(secretbytes);
 		std::string secret = Utils::toHex(secretbytes);
@@ -87,13 +90,10 @@ int main(int argc, char **argv)
 		std::cout << "User added. URL for QR is:" << std::endl;
 		std::cout << userinfo.GetUrl() << std::endl;
 	}
-	catch (const char* msg)
+	catch (OtpError err)
 	{
-		std::cerr << "ERROR: " << msg << std::endl;
-	}
-	catch (std::string msg)
-	{
-		std::cerr << "ERROR: " << msg << std::endl;
+		std::cerr << "ERROR: " << err.GetMessage() << std::endl;
+		return err.GetErrorCode();
 	}
 
 	return 0;

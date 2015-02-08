@@ -19,40 +19,44 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
+#ifndef __OTP_OTPERROR_H_
+#define __OTP_OTPERROR_H_
 
-#ifndef __OTP_OPTIONS_H_
-#define __OTP_OPTIONS_H_
-
-#include <string>
-#include <vector>
-
-class Options
+class OtpError
 {
 	private:
-		std::string ConfigFile;
-		std::string DefaultAuthFile;
-		std::string Issuer;
-		int Digits;
+		int ErrorType;
+		int IntContext;
+		std::string StringContext;
 
-		bool IsInitialized;
+		bool HaveIntContext;
+		bool HaveStringContext;
 
-		void SetDefaults();
-
-		static std::vector<std::string> split(const std::string &s, char delim);
-		static void split(const std::string &s, char delim, std::vector<std::string> & target);
-
-		static std::string & rtrim(std::string &s);
-		static std::string & ltrim(std::string &s);
-		static std::string & trim(std::string &s);
 	public:
-		Options();
-		Options(const std::string & configFile);
+		struct ErrorCodes {
+			enum Codes {
+				NoError = 0,
+				PinMismatch,
+				AuthFileReadError,
+				AuthFileWriteError,
+				UserWriteError,
+				IncorrectPin,
+				UnknownUser,
+				PermissionDenied,
+				ConversionError,
+				CannotDetermineUser,
+				ConfBadOtpLength,
+				ConfUnknownDirective,
+				ConfNotInit
+			};
+		};
 
-		void ReadOptions();
-		std::string GetConfigFile() const;
-		std::string GetAuthFile() const;
-		std::string GetIssuer() const;
-		int GetDigits() const;
+		OtpError (int errorType);
+		OtpError (int errorType, int context);
+		OtpError (int errorType, std::string context);
+
+		std::string GetMessage() const;
+		int GetErrorCode() const;;
 };
 
 #endif

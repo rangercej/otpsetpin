@@ -20,8 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
 
-#include "options.h"
-
 #include <string>
 #include <vector>
 #include <fstream>
@@ -31,17 +29,20 @@ THE SOFTWARE.
 
 #include <cstdlib>
 
+#include "options.h"
+#include "otperror.h"
+
 Options::Options()
 {
 	SetDefaults();
-	ReadOptions();
+	IsInitialized = false;
 }
 
 Options::Options(const std::string & configFile)
 {
 	SetDefaults();
 	ConfigFile = configFile;
-	ReadOptions();
+	IsInitialized = false;
 }
 
 void Options::SetDefaults()
@@ -59,6 +60,7 @@ void Options::ReadOptions()
 
 	if (configFile.fail()) {
 		std::cout << "Warning: could not find configuration file, using defaults" << std::endl;
+		IsInitialized = true;
 		return;
 	}
 
@@ -77,7 +79,7 @@ void Options::ReadOptions()
 		if (property == "otplength") {
 			int val = atoi(trim(value).c_str());
 			if (val != 6 && val != 8) {
-				throw "'otplength' must either be 6 or 8";
+				throw OtpError(OtpError::ErrorCodes::ConfBadOtpLength);
 			}
 			Digits = val;
 		} else if (property == "issuer") {
@@ -85,9 +87,11 @@ void Options::ReadOptions()
 		} else if (property == "authfile") {
 			DefaultAuthFile = value;
 		} else {
-			throw "Unknown configuration directive";
+			throw OtpError(OtpError::ErrorCodes::ConfUnknownDirective);
 		}
 	}
+
+	IsInitialized = true;
 }
 
 std::vector<std::string> Options::split(const std::string &s, char delim)
@@ -121,4 +125,40 @@ inline std::string & Options::rtrim(std::string &s)
 inline std::string & Options::trim(std::string &s)
 {
 	return ltrim(rtrim(s));
+}
+
+std::string Options::GetConfigFile() const
+{
+	if (!IsInitialized) {
+		throw OtpError(OtpError::ErrorCodes::ConfNotInit);
+	}
+
+	return ConfigFile;
+}
+
+std::string Options::GetAuthFile() const
+{
+	if (!IsInitialized) {
+		throw OtpError(OtpError::ErrorCodes::ConfNotInit);
+	}
+
+	return DefaultAuthFile;
+}
+
+std::string Options::GetIssuer() const
+{
+	if (!IsInitialized) {
+		throw OtpError(OtpError::ErrorCodes::ConfNotInit);
+	}
+
+	return Issuer;
+}
+
+int Options::GetDigits() const
+{
+	if (!IsInitialized) {
+		throw OtpError(OtpError::ErrorCodes::ConfNotInit);
+	}
+
+	return Digits;
 }
