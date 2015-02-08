@@ -112,7 +112,7 @@ void UserInfo::UpdateUserFile(int userAction)
 	{
 		std::ifstream authFile(AuthFileName.c_str());
 		std::ofstream newAuthFile(tempFile.c_str());
-		int status = chmod (tempFile.c_str(), S_IRUSR);
+		int status = chmod (tempFile.c_str(), S_IRUSR | S_IWUSR);
 		if (status != 0) {
 			throw OtpError(OtpError::ErrorCodes::AuthFilePermsError, status);
 		}
