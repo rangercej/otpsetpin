@@ -21,8 +21,10 @@ Caveat Emptor
 =============
 
 This is still a work in progress, with much to do. There will probably
-be bugs. A release branch will be created once it appears to be (mostly)
-bug-free, but use at your own risk.
+be bugs. The stable branch is not guranteed to be bug free, but is a
+stake in the ground where I consider the code to be probably okay 
+for use (rather than default which is in constant flux and may not 
+even build).
 
 
 QuickStart/Overview
