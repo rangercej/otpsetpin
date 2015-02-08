@@ -143,44 +143,72 @@ void UserInfo::UpdateUserFile(int userAction)
 std::string UserInfo::GetUrl() const
 {
 	std::stringstream url;
-	url << "otppath://totp/" << OtpOptions.GetIssuer() << ":" << UserId << "@" << Utils::getHostName() << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.GetDigits();
+	url << "otpauth://totp/" << OtpOptions.GetIssuer() << ":" << UserId << "@" << Utils::getHostName() << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.GetDigits();
 
 	return url.str();
 }
 
+//----------------------------------------------------------------------------
+// Summary: Set the user's PIN
+// Params: User's PIN
+// Returns: this object for method chaining
 UserInfo & UserInfo::SetPinNumber(const std::string & pin)
 {
 	PinNumber = pin;
 	return *this;
 }
 
+//----------------------------------------------------------------------------
+// Summary: Set the user's OTP mode
+// Params: OTP mode string
+// Returns: this object for method chaining
 UserInfo & UserInfo::SetMode(const std::string & mode)
 {
 	Mode = mode;
 	return *this;
 }
 
+//----------------------------------------------------------------------------
+// Summary: Set the user's secret
+// Params: Secret value
+// Returns: this object for method chaining
 UserInfo & UserInfo::SetSecret(const std::string & secret)
 {
 	Secret = secret;
 	return *this;
 }
 
+//----------------------------------------------------------------------------
+// Summary: Get the PIN for the current user
+// Params: none
+// Returns: PIN for the current user
 std::string UserInfo::GetPinNumber() const
 {
 	return PinNumber;
 }
 
+//----------------------------------------------------------------------------
+// Summary: Get the OTP mode string for the current user
+// Params: none
+// Returns: OTP mode for the current user
 std::string UserInfo::GetMode() const
 {
 	return Mode;
 }
 
+//----------------------------------------------------------------------------
+// Summary: Get the secret for the current user
+// Params: none
+// Returns: Secret for the current user
 std::string UserInfo::GetSecret() const
 {
 	return Secret;
 }
 
+//----------------------------------------------------------------------------
+// Summary: Get the user ID for this instance
+// Params: none
+// Returns: The current user ID
 std::string UserInfo::GetUserId() const
 {
 	return UserId;
