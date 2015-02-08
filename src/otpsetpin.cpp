@@ -42,15 +42,16 @@ Options options;
 int main(int argc, char **argv)
 {
 	std::vector<std::string> args = Utils::mkArgs(argc, argv);
-
 	std::string user;
 	try {
+		options.ReadOptions();
+
 		if (args.size() > 1) {
 			user = Utils::getUser(args[1]);
 		} else {
 			user = Utils::getCurrentUser();
 		}
-	
+
 		UserInfo userinfo(user, options);
 
 		if (!Utils::runningAsRoot()) {

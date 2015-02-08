@@ -71,11 +71,13 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	std::ostringstream prompt;
-	prompt << "Enter PIN for new user " << newuser;
-	std::string password = Utils::getPassword(prompt.str());
-
 	try {
+		options.ReadOptions();
+
+		std::ostringstream prompt;
+		prompt << "Enter PIN for new user " << newuser;
+		std::string password = Utils::getPassword(prompt.str());
+
 		char secretbytes[64];
 		getSecret(secretbytes);
 		std::string secret = Utils::toHex(secretbytes);

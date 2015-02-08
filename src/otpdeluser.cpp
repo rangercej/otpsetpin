@@ -60,6 +60,8 @@ int main(int argc, char **argv)
 	}
 
 	try {
+		options.ReadOptions();
+
 		UserInfo userinfo(deluser, options);
 		userinfo.Delete();
 	}

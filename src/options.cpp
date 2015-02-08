@@ -32,18 +32,17 @@ THE SOFTWARE.
 #include "options.h"
 #include "otperror.h"
 
-
 Options::Options()
 {
 	SetDefaults();
-	ReadOptions();
+	IsInitialized = false;
 }
 
 Options::Options(const std::string & configFile)
 {
 	SetDefaults();
 	ConfigFile = configFile;
-	ReadOptions();
+	IsInitialized = false;
 }
 
 void Options::SetDefaults()
@@ -90,6 +89,8 @@ void Options::ReadOptions()
 			throw OtpError(OtpError::ErrorCodes::ConfUnknownDirective);
 		}
 	}
+
+	IsInitialized = true;
 }
 
 std::vector<std::string> Options::split(const std::string &s, char delim)
@@ -123,4 +124,40 @@ inline std::string & Options::rtrim(std::string &s)
 inline std::string & Options::trim(std::string &s)
 {
 	return ltrim(rtrim(s));
+}
+
+std::string Options::GetConfigFile() const
+{
+	if (!IsInitialized) {
+		throw OtpError(OtpError::ErrorCodes::ConfNotInit);
+	}
+
+	return ConfigFile;
+}
+
+std::string Options::GetAuthFile() const
+{
+	if (!IsInitialized) {
+		throw OtpError(OtpError::ErrorCodes::ConfNotInit);
+	}
+
+	return DefaultAuthFile;
+}
+
+std::string Options::GetIssuer() const
+{
+	if (!IsInitialized) {
+		throw OtpError(OtpError::ErrorCodes::ConfNotInit);
+	}
+
+	return Issuer;
+}
+
+int Options::GetDigits() const
+{
+	if (!IsInitialized) {
+		throw OtpError(OtpError::ErrorCodes::ConfNotInit);
+	}
+
+	return Digits;
 }

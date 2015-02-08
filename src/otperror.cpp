@@ -88,6 +88,9 @@ std::string OtpError::GetMessage() const
 		case ErrorCodes::ConfUnknownDirective:
 			errorText <<  "Unknown configuration directive";
 			break;
+		case ErrorCodes::ConfNotInit:
+			errorText <<  "Configuration has not been initialized";
+			break;
 		default:
 			errorText <<  "Unknown error:" << ErrorType;
 	}

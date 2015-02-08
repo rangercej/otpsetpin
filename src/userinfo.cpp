@@ -32,7 +32,7 @@ THE SOFTWARE.
 UserInfo::UserInfo(const std::string & userId, const Options & options)
 {
 	OtpOptions = options;
-	AuthFileName = options.DefaultAuthFile;
+	AuthFileName = options.GetAuthFile();
 	UserId = userId;
 	Mode = "";
 	PinNumber = "";
@@ -143,7 +143,7 @@ void UserInfo::UpdateUserFile(int userAction)
 std::string UserInfo::GetUrl() const
 {
 	std::stringstream url;
-	url << "otppath://totp/" << OtpOptions.Issuer << ":" << UserId << "@" << Utils::getHostName() << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.Digits;
+	url << "otppath://totp/" << OtpOptions.GetIssuer() << ":" << UserId << "@" << Utils::getHostName() << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.GetDigits();
 
 	return url.str();
 }

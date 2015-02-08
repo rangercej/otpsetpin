@@ -46,7 +46,8 @@ class OtpError
 				ConversionError,
 				CannotDetermineUser,
 				ConfBadOtpLength,
-				ConfUnknownDirective
+				ConfUnknownDirective,
+				ConfNotInit
 			};
 		};
 

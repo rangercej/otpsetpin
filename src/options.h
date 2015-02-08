@@ -30,8 +30,12 @@ class Options
 {
 	private:
 		std::string ConfigFile;
+		std::string DefaultAuthFile;
+		std::string Issuer;
+		int Digits;
 
-		void ReadOptions();
+		bool IsInitialized;
+
 		void SetDefaults();
 
 		static std::vector<std::string> split(const std::string &s, char delim);
@@ -41,12 +45,14 @@ class Options
 		static std::string & ltrim(std::string &s);
 		static std::string & trim(std::string &s);
 	public:
-		std::string DefaultAuthFile;
-		std::string Issuer;
-		int Digits;
-
 		Options();
 		Options(const std::string & configFile);
+
+		void ReadOptions();
+		std::string GetConfigFile() const;
+		std::string GetAuthFile() const;
+		std::string GetIssuer() const;
+		int GetDigits() const;
 };
 
 #endif

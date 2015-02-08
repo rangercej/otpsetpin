@@ -50,6 +50,8 @@ int main(int argc, char **argv)
 
 	std::string user;
 	try {
+		options.ReadOptions();
+
 		if (args.size() > 1) {
 			user = Utils::getUser(args[1]);
 		} else {
