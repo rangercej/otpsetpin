@@ -26,13 +26,14 @@ THE SOFTWARE.
 
 #include <cstdlib>
 
+extern "C" {
+	#include <unistd.h>
+	#include <liboath/oath.h>
+}
+
 #include "utils.h"
 #include "options.h"
-#include "userinfo.h"
 
-const int RcOkay = 0;
-const int RcError = 1;
-	
 Options options;
 
 //----------------------------------------------------------------------------
@@ -43,42 +44,32 @@ Options options;
 // Returns: program exit code
 int main(int argc, char **argv)
 {
+	if (argc == 0) {
+		std::cout << "Syntax: otpdeluser {user}" << std::endl;
+		return 1;
+	}
+
 	std::vector<std::string> args = Utils::mkArgs(argc, argv);
 
-	std::string user;
+	std::string deluser(argv[1]);
+
+	if (deluser == "") {
+		std::cout << "No user provided." << std::endl;
+		return 1;
+	}
+
 	try {
-		if (args.size() > 1) {
-			user = Utils::getUser(args[1]);
-		} else {
-			user = Utils::getCurrentUser();
-		}
-	
-		UserInfo userinfo(user, options);
-
-		if (!Utils::runningAsRoot()) {
-			if (!Utils::validateUserPin(userinfo)) {
-				throw "Invalid PIN.";
-			}
-		}
-	
-		std::string newpin1 = Utils::getPassword("Enter new PIN");
-		std::string newpin2 = Utils::getPassword("Enter new PIN again");
-	
-		if (newpin1 != newpin2) {
-			throw "PINs do not match.";
-		}
-	
-		userinfo.SetPinNumber(newpin2);
-		userinfo.Update();
-		
-		return RcOkay;
+		UserInfo userinfo(deluser, options);
+		userinfo.Delete();
 	}
-	catch (const char *msg) {
-		std::cerr << msg << std::endl;
+	catch (const char* msg)
+	{
+		std::cerr << "ERROR: " << msg << std::endl;
 	}
-	catch (std::string msg) {
-		std::cerr << msg << std::endl;
+	catch (std::string msg)
+	{
+		std::cerr << "ERROR: " << msg << std::endl;
 	}
 
-	return RcError;
+	return 0;
 }

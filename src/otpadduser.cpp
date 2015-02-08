@@ -24,15 +24,12 @@ THE SOFTWARE.
 #include <sstream>
 #include <fstream>
 #include <vector>
-#include <iomanip>
-#include <iterator>
-#include <algorithm>
 
-#include <unistd.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 extern "C" {
-#include <liboath/oath.h>
+	#include <unistd.h>
+	#include <liboath/oath.h>
 }
 
 #include "utils.h"

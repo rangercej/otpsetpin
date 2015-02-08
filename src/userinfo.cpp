@@ -66,39 +66,21 @@ void UserInfo::Get()
 }
 
 //----------------------------------------------------------------------------
+// Summary: Delete the user details from the auth file
+// Params: none
+// Returns: nothing
+void UserInfo::Delete()
+{
+	UpdateUserFile(UserAction::Delete);
+}
+
+//----------------------------------------------------------------------------
 // Summary: Update the user details in the auth file
 // Params: none
 // Returns: nothing
 void UserInfo::Update()
 {
-	std::string type;
-	std::string userin;
-	std::string pin, secret, temp;
-	bool userwrote = false;
-	std::string tempFile = AuthFileName + ".new";
-	
-	{
-		std::ifstream authFile(AuthFileName.c_str());
-		std::ofstream newAuthFile(tempFile.c_str());
-		while (authFile >> type >> userin >> pin >> secret && std::getline(authFile, temp)) {
-			if (userin != UserId) {
-				newAuthFile << type << " " << userin << " " << pin << " " << secret << " " << temp << std::endl;
-			} else {
-				newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << temp << std::endl;
-				userwrote = true;
-			}
-		}
-	}	
-
-	if (!userwrote) {
-		// We should never call this, but have it in just in case
-		// something happens (a race possibly?).
-		std::stringstream err;
-		err << "Error - didn't update user " << UserId << ". User removed from OTP?";
-		throw err.str();
-	} else {
-		::rename(tempFile.c_str(), AuthFileName.c_str());
-	}
+	UpdateUserFile(UserAction::Update);
 }
 
 //----------------------------------------------------------------------------
@@ -107,6 +89,15 @@ void UserInfo::Update()
 // Returns: nothing
 void UserInfo::Create()
 {
+	UpdateUserFile(UserAction::Create);
+}
+
+//----------------------------------------------------------------------------
+// Summary: Manage writing to the auth file
+// Params: How to write the user
+// Returns: nothing
+void UserInfo::UpdateUserFile(int userAction)
+{
 	std::string type;
 	std::string userin;
 	std::string pin, secret, temp;
@@ -116,22 +107,36 @@ void UserInfo::Create()
 	{
 		std::ifstream authFile(AuthFileName.c_str());
 		std::ofstream newAuthFile(tempFile.c_str());
-		while (authFile >> type >> userin >> pin >> secret && std::getline(authFile, temp))
-		{
+		if (newAuthFile.fail()) {
+			throw "Cannot open auth file for writing";
+		}
+
+		while (authFile >> type >> userin >> pin >> secret && std::getline(authFile, temp)) {
 			if (userin != UserId) {
 				newAuthFile << type << " " << userin << " " << pin << " " << secret << " " << temp << std::endl;
 			} else {
-				newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << temp << std::endl;
 				userwrote = true;
+				if (userAction != UserAction::Delete) {
+					newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << temp << std::endl;
+				}
 			}
 		}
 
-		if (!userwrote) {
+		if (!userwrote && userAction == UserAction::Create) {
 			newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << std::endl;
+			userwrote = true;
 		}
 	}	
 
-	::rename(tempFile.c_str(), AuthFileName.c_str());
+	if (!userwrote) {
+		// We should never call this, but have it in just in case
+		// something happens (a race possibly?).
+		std::stringstream err;
+		err << "Error - failed to update user " << UserId;
+		throw err.str();
+	} else {
+		::rename(tempFile.c_str(), AuthFileName.c_str());
+	}
 }
 
 //----------------------------------------------------------------------------

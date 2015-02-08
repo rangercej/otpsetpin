@@ -27,6 +27,10 @@ THE SOFTWARE.
 class UserInfo {
 
 	private:
+		struct UserAction {
+			enum Actions { Create, Update, Delete };
+		};
+
 		std::string AuthFileName;
 		Options OtpOptions;
 
@@ -35,12 +39,15 @@ class UserInfo {
 		std::string Mode;
 		std::string Secret;
 
+		void UpdateUserFile(int userAction);
+
 		void Get();
 
 	public:
 		UserInfo(const std::string & userId, const Options & options);
 		void Update();
 		void Create();
+		void Delete();
 
 		UserInfo & SetPinNumber(const std::string &);
 		UserInfo & SetMode(const std::string &);
