@@ -31,10 +31,6 @@ THE SOFTWARE.
 #include "options.h"
 #include "userinfo.h"
 
-using namespace std;
-
-const string ErrNoPin = "NOPIN";
-
 const int RcOkay = 0;
 const int RcError = 1;
 	
@@ -48,9 +44,9 @@ Options options;
 // Returns: program exit code
 int main(int argc, char **argv)
 {
-	vector<string> args = Utils::mkArgs(argc, argv);
+	std::vector<std::string> args = Utils::mkArgs(argc, argv);
 
-	string user;
+	std::string user;
 	try {
 		if (args.size() > 1) {
 			user = Utils::getUser(args[1]);
@@ -66,8 +62,8 @@ int main(int argc, char **argv)
 			}
 		}
 	
-		string newpin1 = Utils::getPassword("Enter new PIN");
-		string newpin2 = Utils::getPassword("Enter new PIN again");
+		std::string newpin1 = Utils::getPassword("Enter new PIN");
+		std::string newpin2 = Utils::getPassword("Enter new PIN again");
 	
 		if (newpin1 != newpin2) {
 			throw "PINs do not match.";
@@ -79,10 +75,10 @@ int main(int argc, char **argv)
 		return RcOkay;
 	}
 	catch (const char *msg) {
-		cerr << msg << endl;
+		std::cerr << msg << std::endl;
 	}
-	catch (string msg) {
-		cerr << msg << endl;
+	catch (std::string msg) {
+		std::cerr << msg << std::endl;
 	}
 
 	return RcError;

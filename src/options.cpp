@@ -31,15 +31,13 @@ THE SOFTWARE.
 
 #include <cstdlib>
 
-using namespace std;
-
 Options::Options()
 {
 	SetDefaults();
 	ReadOptions();
 }
 
-Options::Options(const string & configFile)
+Options::Options(const std::string & configFile)
 {
 	SetDefaults();
 	ConfigFile = configFile;
@@ -56,15 +54,15 @@ void Options::SetDefaults()
 
 void Options::ReadOptions()
 {
-	ifstream configFile(ConfigFile.c_str());
-	string line;
+	std::ifstream configFile(ConfigFile.c_str());
+	std::string line;
 
 	if (configFile.fail()) {
-		cout << "Warning: could not find configuration file, using defaults" << endl;
+		std::cout << "Warning: could not find configuration file, using defaults" << std::endl;
 		return;
 	}
 
-	while (getline(configFile, line)) {
+	while (std::getline(configFile, line)) {
 		line = trim(line);
 		if (line.size() == 0) {
 			continue;
@@ -73,9 +71,9 @@ void Options::ReadOptions()
 			continue;
 		}
 
-		vector<string> parts = split(line, '=');
-		string property = trim(parts[0]);
-		string value = trim(parts[1]);
+		std::vector<std::string> parts = split(line, '=');
+		std::string property = trim(parts[0]);
+		std::string value = trim(parts[1]);
 		if (property == "otplength") {
 			int val = atoi(trim(value).c_str());
 			if (val != 6 && val != 8) {
@@ -92,35 +90,35 @@ void Options::ReadOptions()
 	}
 }
 
-vector<string> Options::split(const string &s, char delim)
+std::vector<std::string> Options::split(const std::string &s, char delim)
 {
-	vector<string> elems;
+	std::vector<std::string> elems;
 	split (s, delim, elems);
 	return elems;
 }
 
-void Options::split(const string &s, char delim, vector<string> & target)
+void Options::split(const std::string &s, char delim, std::vector<std::string> & target)
 {
-	stringstream ss(s);
-	string item;
-	while (getline(ss, item, delim)) {
+	std::stringstream ss(s);
+	std::string item;
+	while (std::getline(ss, item, delim)) {
 		target.push_back(item);
 	}
 }
 
-inline string & Options::ltrim(string &s)
+inline std::string & Options::ltrim(std::string &s)
 {
-	s.erase(s.begin(), find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(isspace))));
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
 	return s;
 }
 
-inline string & Options::rtrim(string &s)
+inline std::string & Options::rtrim(std::string &s)
 {
-	s.erase(find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(isspace))).base(), s.end());
+	s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
 	return s;
 }
 
-inline string & Options::trim(string &s)
+inline std::string & Options::trim(std::string &s)
 {
 	return ltrim(rtrim(s));
 }

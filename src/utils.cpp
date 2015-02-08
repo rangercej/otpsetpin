@@ -35,8 +35,6 @@ extern "C" {
 #include "utils.h"
 #include "userinfo.h"
 
-using namespace std;
-
 //----------------------------------------------------------------------------
 Utils::Utils()
 {
@@ -45,9 +43,9 @@ Utils::Utils()
 //----------------------------------------------------------------------------
 // Summary: Create a vector from the command line arguments
 // Returns: Vector of argv
-vector<string> Utils::mkArgs (int argc, char **argv)
+std::vector<std::string> Utils::mkArgs (int argc, char **argv)
 {
-	vector<string> args;
+	std::vector<std::string> args;
 
 	for (int i = 0; i < argc; i++) {
 		args.push_back(argv[i]);
@@ -70,9 +68,9 @@ bool Utils::runningAsRoot()
 // Params:
 //     prompt - The prompt to display to the user
 // Returns: User entered password.
-string Utils::getPassword(const string & prompt)
+std::string Utils::getPassword(const std::string & prompt)
 {
-	string s = prompt;
+	std::string s = prompt;
 	s.append(": ");
 	return getpass(prompt.c_str());
 }
@@ -84,9 +82,9 @@ string Utils::getPassword(const string & prompt)
 // Returns: true on success
 bool Utils::validateUserPin(const UserInfo & userinfo)
 {
-	ostringstream prompt;
+	std::ostringstream prompt;
 	prompt << "Enter existing PIN for " << userinfo.GetUserId();
-	string password = getPassword(prompt.str());
+	std::string password = getPassword(prompt.str());
 
 	if (password != userinfo.GetPinNumber()) {
 		return false;
@@ -98,7 +96,7 @@ bool Utils::validateUserPin(const UserInfo & userinfo)
 //----------------------------------------------------------------------------
 // Summary: user in system authentication database (/etc/passwd)
 // Returns: true or false
-bool Utils::isUserKnownToSystem(const string & username)
+bool Utils::isUserKnownToSystem(const std::string & username)
 {
 	if (username == "") {
 		return false;
@@ -114,7 +112,7 @@ bool Utils::isUserKnownToSystem(const string & username)
 //----------------------------------------------------------------------------
 // Summary: get and validate a user-supplied user ID
 // Returns: passed in username
-string Utils::getUser(const string & user)
+std::string Utils::getUser(const std::string & user)
 {
 	int uid = getuid();
 	if (uid != 0) {
@@ -122,7 +120,7 @@ string Utils::getUser(const string & user)
 	}
 
 	if (!isUserKnownToSystem(user)) {
-		stringstream err;
+		std::stringstream err;
 		err << "User not known: " << user;
 		throw err.str();
 	}
@@ -133,7 +131,7 @@ string Utils::getUser(const string & user)
 //----------------------------------------------------------------------------
 // Summary: Get the current login
 // Returns: current login ID
-string Utils::getCurrentUser()
+std::string Utils::getCurrentUser()
 {
 	int uid = getuid();
 
@@ -142,32 +140,32 @@ string Utils::getCurrentUser()
 		throw "Could not determine current user";
 	}
 
-	return string(userData->pw_name);
+	return std::string(userData->pw_name);
 }
 
 //----------------------------------------------------------------------------
 // Summary: Convert bytes to a hex string
 // Params: Secret to convert
 // Returns: Hex version of the secret
-string Utils::toHex(const char *secret)
+std::string Utils::toHex(const char *secret)
 {
 	char hexBuffer[1024];
 	oath_bin2hex(secret, SECRETLENGTH, hexBuffer);
 
-	return string(hexBuffer);
+	return std::string(hexBuffer);
 }
 
 //----------------------------------------------------------------------------
 // Summary: Convert bytes to a base32 string
 // Params: Secret to convert as a hex string
 // Returns: Base32 version of the secret
-string Utils::toBase32(const char *secret)
+std::string Utils::toBase32(const char *secret)
 {
 	char *b32Buffer;
 	size_t b32Length;
 	oath_base32_encode(secret, SECRETLENGTH, &b32Buffer, &b32Length);
 
-	string b32Secret(b32Buffer);
+	std::string b32Secret(b32Buffer);
 	::free(b32Buffer);
 
 	return b32Secret;
@@ -177,14 +175,14 @@ string Utils::toBase32(const char *secret)
 // Summary: Convert hexstring to a base32 string
 // Params: Hex string to convert
 // Returns: Base32 version of the string
-string Utils::hexToBase32(const string & hexString)
+std::string Utils::hexToBase32(const std::string & hexString)
 {
 	char bytes[128];
 	size_t byteLen = sizeof(bytes);
 	int ok = oath_hex2bin (hexString.c_str(), bytes, &byteLen);
 
 	if (ok != OATH_OK) {
-		stringstream err;
+		std::stringstream err;
 		err << "Erro converting hex string: " << ok;
 		throw err.str();
 	}

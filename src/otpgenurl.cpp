@@ -36,10 +36,6 @@ extern "C" {
 #include "options.h"
 #include "userinfo.h"
 
-using namespace std;
-
-const string ErrNoPin = "NOPIN";
-
 const int RcOkay = 0;
 const int RcError = 1;
 
@@ -53,9 +49,9 @@ Options options;
 // Returns: program exit code
 int main(int argc, char **argv)
 {
-	vector<string> args = Utils::mkArgs(argc, argv);
+	std::vector<std::string> args = Utils::mkArgs(argc, argv);
 
-	string user;
+	std::string user;
 	try {
 		if (args.size() > 1) {
 			user = Utils::getUser(args[1]);
@@ -71,14 +67,14 @@ int main(int argc, char **argv)
 			}
 		}
 
-		cout << userinfo.GetUrl() << endl;
+		std::cout << userinfo.GetUrl() << std::endl;
 		return RcOkay;
 	}
 	catch (const char *msg) {
-		cerr << msg << endl;
+		std::cerr << msg << std::endl;
 	}
-	catch (string msg) {
-		cerr << msg << endl;
+	catch (std::string msg) {
+		std::cerr << msg << std::endl;
 	}
 
 	return RcError;

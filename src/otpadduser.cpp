@@ -38,15 +38,13 @@ extern "C" {
 #include "utils.h"
 #include "options.h"
 
-using namespace std;
-
 Options options;
 
 //----------------------------------------------------------------------------
 // Summary: Get the computer name
 // Params: none
 // Returns: computer name, or UNKNOWN on error
-string getHostName()
+std::string getHostName()
 {
 	char hostBuffer[256];
 	int result = gethostname(hostBuffer, sizeof(hostBuffer));
@@ -64,7 +62,7 @@ string getHostName()
 void getSecret(char *target)
 {
 	char *p = (char*)target;
-	fstream randomStream("/dev/urandom");
+	std::fstream randomStream("/dev/urandom");
 	randomStream.read(p, SECRETLENGTH);
 }
 
@@ -77,43 +75,43 @@ void getSecret(char *target)
 int main(int argc, char **argv)
 {
 	if (argc == 0) {
-		cout << "Syntax: otpadduser {user}" << endl;
+		std::cout << "Syntax: otpadduser {user}" << std::endl;
 		return 1;
 	}
 
-	vector<string> args = Utils::mkArgs(argc, argv);
+	std::vector<std::string> args = Utils::mkArgs(argc, argv);
 
-	string newuser(argv[1]);
+	std::string newuser(argv[1]);
 
 	if (newuser == "") {
-		cout << "No user provided.";
+		std::cout << "No user provided." << std::endl;
 		return 1;
 	}
 
-	ostringstream prompt;
+	std::ostringstream prompt;
 	prompt << "Enter PIN for new user " << newuser;
-	string password = Utils::getPassword(prompt.str());
+	std::string password = Utils::getPassword(prompt.str());
 
 	try {
 		char secretbytes[64];
 		getSecret(secretbytes);
-		string secret = Utils::toHex(secretbytes);
+		std::string secret = Utils::toHex(secretbytes);
 
 		UserInfo userinfo(newuser, options);
 		userinfo.SetMode("HOTP/T30").SetPinNumber(password).SetSecret(secret);
 		userinfo.Create();
 
 		// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format
-		cout << "User added. URL for QR is:" << endl;
-		cout << userinfo.GetUrl() << endl;
+		std::cout << "User added. URL for QR is:" << std::endl;
+		std::cout << userinfo.GetUrl() << std::endl;
 	}
 	catch (const char* msg)
 	{
-		cerr << "ERROR: " << msg << endl;
+		std::cerr << "ERROR: " << msg << std::endl;
 	}
-	catch (string msg)
+	catch (std::string msg)
 	{
-		cerr << "ERROR: " << msg << endl;
+		std::cerr << "ERROR: " << msg << std::endl;
 	}
 
 	return 0;

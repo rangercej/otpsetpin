@@ -28,9 +28,7 @@ THE SOFTWARE.
 #include "utils.h"
 #include "options.h"
 
-using namespace std;
-
-UserInfo::UserInfo(const string & userId, const Options & options)
+UserInfo::UserInfo(const std::string & userId, const Options & options)
 {
 	OtpOptions = options;
 	AuthFileName = options.DefaultAuthFile;
@@ -47,17 +45,17 @@ UserInfo::UserInfo(const string & userId, const Options & options)
 // Returns: nothing
 void UserInfo::Get()
 {
-	string type;
-	string userin;
-	string pin, secret, temp;
+	std::string type;
+	std::string userin;
+	std::string pin, secret, temp;
 	
-	ifstream authFile(AuthFileName.c_str());
+	std::ifstream authFile(AuthFileName.c_str());
 	if (authFile.fail())
 	{
 		throw "Cannot open authorisation file.";
 	}
 
-	while (authFile >> type >> userin >> pin >> secret && getline(authFile, temp)) {
+	while (authFile >> type >> userin >> pin >> secret && std::getline(authFile, temp)) {
 		if (userin == UserId) {
 			Mode = type;
 			PinNumber = pin;
@@ -73,20 +71,20 @@ void UserInfo::Get()
 // Returns: nothing
 void UserInfo::Update()
 {
-	string type;
-	string userin;
-	string pin, secret, temp;
+	std::string type;
+	std::string userin;
+	std::string pin, secret, temp;
 	bool userwrote = false;
-	string tempFile = AuthFileName + ".new";
+	std::string tempFile = AuthFileName + ".new";
 	
 	{
-		ifstream authFile(AuthFileName.c_str());
-		ofstream newAuthFile(tempFile.c_str());
-		while (authFile >> type >> userin >> pin >> secret && getline(authFile, temp)) {
+		std::ifstream authFile(AuthFileName.c_str());
+		std::ofstream newAuthFile(tempFile.c_str());
+		while (authFile >> type >> userin >> pin >> secret && std::getline(authFile, temp)) {
 			if (userin != UserId) {
-				newAuthFile << type << " " << userin << " " << pin << " " << secret << " " << temp << endl;
+				newAuthFile << type << " " << userin << " " << pin << " " << secret << " " << temp << std::endl;
 			} else {
-				newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << temp << endl;
+				newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << temp << std::endl;
 				userwrote = true;
 			}
 		}
@@ -95,7 +93,7 @@ void UserInfo::Update()
 	if (!userwrote) {
 		// We should never call this, but have it in just in case
 		// something happens (a race possibly?).
-		stringstream err;
+		std::stringstream err;
 		err << "Error - didn't update user " << UserId << ". User removed from OTP?";
 		throw err.str();
 	} else {
@@ -109,27 +107,27 @@ void UserInfo::Update()
 // Returns: nothing
 void UserInfo::Create()
 {
-	string type;
-	string userin;
-	string pin, secret, temp;
+	std::string type;
+	std::string userin;
+	std::string pin, secret, temp;
 	bool userwrote = false;
-	string tempFile = AuthFileName + ".new";
+	std::string tempFile = AuthFileName + ".new";
 	
 	{
-		ifstream authFile(AuthFileName.c_str());
-		ofstream newAuthFile(tempFile.c_str());
-		while (authFile >> type >> userin >> pin >> secret && getline(authFile, temp))
+		std::ifstream authFile(AuthFileName.c_str());
+		std::ofstream newAuthFile(tempFile.c_str());
+		while (authFile >> type >> userin >> pin >> secret && std::getline(authFile, temp))
 		{
 			if (userin != UserId) {
-				newAuthFile << type << " " << userin << " " << pin << " " << secret << " " << temp << endl;
+				newAuthFile << type << " " << userin << " " << pin << " " << secret << " " << temp << std::endl;
 			} else {
-				newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << temp << endl;
+				newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << temp << std::endl;
 				userwrote = true;
 			}
 		}
 
 		if (!userwrote) {
-			newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << endl;
+			newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << std::endl;
 		}
 	}	
 
@@ -140,48 +138,48 @@ void UserInfo::Create()
 // Summary: Create OTP URL for use with QR code for FreeOTP
 // Params: none
 // Returns: otppath:// URL string
-string UserInfo::GetUrl() const
+std::string UserInfo::GetUrl() const
 {
-	stringstream url;
+	std::stringstream url;
 	url << "otppath://totp/" << OtpOptions.Issuer << ":" << UserId << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.Digits;
 
 	return url.str();
 }
 
-UserInfo & UserInfo::SetPinNumber(const string & pin)
+UserInfo & UserInfo::SetPinNumber(const std::string & pin)
 {
 	PinNumber = pin;
 	return *this;
 }
 
-UserInfo & UserInfo::SetMode(const string & mode)
+UserInfo & UserInfo::SetMode(const std::string & mode)
 {
 	Mode = mode;
 	return *this;
 }
 
-UserInfo & UserInfo::SetSecret(const string & secret)
+UserInfo & UserInfo::SetSecret(const std::string & secret)
 {
 	Secret = secret;
 	return *this;
 }
 
-string UserInfo::GetPinNumber() const
+std::string UserInfo::GetPinNumber() const
 {
 	return PinNumber;
 }
 
-string UserInfo::GetMode() const
+std::string UserInfo::GetMode() const
 {
 	return Mode;
 }
 
-string UserInfo::GetSecret() const
+std::string UserInfo::GetSecret() const
 {
 	return Secret;
 }
 
-string UserInfo::GetUserId() const
+std::string UserInfo::GetUserId() const
 {
 	return UserId;
 }
