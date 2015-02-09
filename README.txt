@@ -34,8 +34,14 @@ Userland utils:
 	otpsetpin - intended to be setuid root, a utility to allow users
 		to change their OTP pin
 
+	otpgenurl - intended to be setuid root, a utility to allow users
+		to re-fetch their otpauth:// URL.
+
 	otpadduser - intended to be ran by root, create an OTP entry for
 		the user so they can log in using OTP.
+
+	otpdeluser - intended to be ran by root, remove an OTP entry for
+		the user, disabling OTP for them.
 
 User configuration is in /etc/users.oath. This file should be root read-only
 as it contains plaintext PIN and secret.
