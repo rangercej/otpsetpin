@@ -20,28 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
 
-#ifndef __OTP_UTILS_H_
-#define __OTP_UTILS_H_
+#ifndef __OTP_SECRET_H_
+#define __OTP_SECRET_H_
 
-#include <vector>
-#include "options.h"
-#include "userinfo.h"
-
-#define SECRETLENGTH	32
-
-class Utils
+class Secret
 {
-	public:
-		Utils();
+	private:
+		static const size_t SecretLength = 32;
+		char SecretBytes[128];
 
-		static bool runningAsRoot();
-		static std::vector<std::string> mkArgs (int argc, char **argv);
-		static std::string getPassword(const std::string & prompt);
-		static bool validateUserPin(const UserInfo & user);
-		static bool isUserKnownToSystem(const std::string & username);
-		static std::string getUser(const std::string & user);
-		static std::string getCurrentUser();
-		static std::string getHostName();
+	public:
+		Secret();
+		Secret(std::string hexString);
+
+		std::string ToHexString();
+		std::string ToBase32String();
 };
 
 #endif
