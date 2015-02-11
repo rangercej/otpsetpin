@@ -37,7 +37,7 @@ class UserInfo {
 		std::string UserId;
 		std::string PinNumber;
 		std::string Mode;
-		std::string Secret;
+		std::string SharedSecret;
 
 		void UpdateUserFile(int userAction);
 

@@ -94,6 +94,9 @@ std::string OtpError::GetMessage() const
 		case ErrorCodes::ConfNotInit:
 			errorText <<  "Configuration has not been initialized";
 			break;
+		case ErrorCodes::BadSecret:
+			errorText <<  "Invalid secret supplied";
+			break;
 		default:
 			errorText <<  "Unknown error:" << ErrorType;
 	}

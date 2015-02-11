@@ -48,7 +48,8 @@ class OtpError
 				CannotDetermineUser,
 				ConfBadOtpLength,
 				ConfUnknownDirective,
-				ConfNotInit
+				ConfNotInit,
+				BadSecret
 			};
 		};
 

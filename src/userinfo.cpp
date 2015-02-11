@@ -31,6 +31,7 @@ extern "C" {
 #include "userinfo.h"
 #include "utils.h"
 #include "options.h"
+#include "secret.h"
 #include "otperror.h"
 
 UserInfo::UserInfo(const std::string & userId, const Options & options)
@@ -40,7 +41,7 @@ UserInfo::UserInfo(const std::string & userId, const Options & options)
 	UserId = userId;
 	Mode = "";
 	PinNumber = "";
-	Secret = "";
+	SharedSecret = "";
 	Get();
 }
 
@@ -64,7 +65,7 @@ void UserInfo::Get()
 		if (userin == UserId) {
 			Mode = type;
 			PinNumber = pin;
-			Secret = secret;
+			SharedSecret = secret;
 		}
 	}
 
@@ -126,13 +127,13 @@ void UserInfo::UpdateUserFile(int userAction)
 			} else {
 				userwrote = true;
 				if (userAction != UserAction::Delete) {
-					newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << temp << std::endl;
+					newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << SharedSecret << " " << temp << std::endl;
 				}
 			}
 		}
 
 		if (!userwrote && userAction == UserAction::Create) {
-			newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << Secret << " " << std::endl;
+			newAuthFile << Mode << " " << UserId << " " << PinNumber << " " << SharedSecret << " " << std::endl;
 			userwrote = true;
 		}
 	}	
@@ -151,7 +152,10 @@ void UserInfo::UpdateUserFile(int userAction)
 std::string UserInfo::GetUrl() const
 {
 	std::stringstream url;
-	url << "otpauth://totp/" << OtpOptions.GetIssuer() << ":" << UserId << "@" << Utils::getHostName() << "?secret=" << Utils::hexToBase32(Secret) << "&digits=" << OtpOptions.GetDigits();
+
+	Secret secret(SharedSecret);
+
+	url << "otpauth://totp/" << OtpOptions.GetIssuer() << ":" << UserId << "@" << Utils::getHostName() << "?secret=" << secret.ToBase32String() << "&digits=" << OtpOptions.GetDigits();
 
 	return url.str();
 }
@@ -182,7 +186,7 @@ UserInfo & UserInfo::SetMode(const std::string & mode)
 // Returns: this object for method chaining
 UserInfo & UserInfo::SetSecret(const std::string & secret)
 {
-	Secret = secret;
+	SharedSecret = secret;
 	return *this;
 }
 
@@ -210,7 +214,7 @@ std::string UserInfo::GetMode() const
 // Returns: Secret for the current user
 std::string UserInfo::GetSecret() const
 {
-	return Secret;
+	return SharedSecret;
 }
 
 //----------------------------------------------------------------------------
