@@ -1,0 +1,7 @@
+#
+# A sample configuration for the OTP userland tools
+# This should live as /etc/options.oath 
+#
+issuer=Nightwolf
+authfile=/etc/users.oath
+otplength=6
