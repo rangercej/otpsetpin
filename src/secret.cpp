@@ -21,6 +21,7 @@ THE SOFTWARE.
 *****************************************************************************/
 
 #include <string>
+#include <iostream>
 #include <fstream>
 #include <cstdlib>
 
@@ -55,6 +56,8 @@ Secret::Secret(std::string hexString)
 	if (byteLen != SecretLength) {
 		throw OtpError(OtpError::ErrorCodes::BadSecret);
 	}
+
+	memcpy(SecretBytes, bytes, SecretLength);
 }
 
 //----------------------------------------------------------------------------

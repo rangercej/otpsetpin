@@ -821,8 +821,8 @@ secret.o: secret.cpp /usr/include/c++/4.7/string \
  /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
  /usr/include/x86_64-linux-gnu/bits/setjmp.h \
  /usr/include/c++/4.7/x86_64-linux-gnu/bits/atomic_word.h \
- /usr/include/c++/4.7/bits/basic_string.tcc /usr/include/c++/4.7/fstream \
- /usr/include/c++/4.7/istream /usr/include/c++/4.7/ios \
+ /usr/include/c++/4.7/bits/basic_string.tcc /usr/include/c++/4.7/iostream \
+ /usr/include/c++/4.7/ostream /usr/include/c++/4.7/ios \
  /usr/include/c++/4.7/bits/ios_base.h \
  /usr/include/c++/4.7/bits/locale_classes.h \
  /usr/include/c++/4.7/bits/locale_classes.tcc \
@@ -834,9 +834,9 @@ secret.o: secret.cpp /usr/include/c++/4.7/string \
  /usr/include/c++/4.7/bits/streambuf_iterator.h \
  /usr/include/c++/4.7/x86_64-linux-gnu/bits/ctype_inline.h \
  /usr/include/c++/4.7/bits/locale_facets.tcc \
- /usr/include/c++/4.7/bits/basic_ios.tcc /usr/include/c++/4.7/ostream \
- /usr/include/c++/4.7/bits/ostream.tcc \
- /usr/include/c++/4.7/bits/istream.tcc \
+ /usr/include/c++/4.7/bits/basic_ios.tcc \
+ /usr/include/c++/4.7/bits/ostream.tcc /usr/include/c++/4.7/istream \
+ /usr/include/c++/4.7/bits/istream.tcc /usr/include/c++/4.7/fstream \
  /usr/include/c++/4.7/bits/codecvt.h /usr/include/c++/4.7/cstdio \
  /usr/include/libio.h /usr/include/_G_config.h \
  /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
