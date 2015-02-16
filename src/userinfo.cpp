@@ -23,10 +23,14 @@ THE SOFTWARE.
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <cerrno>
 
 extern "C" {
 #include <sys/stat.h>
 }
+
+#include <qrencode.h>
+#include <gd.h>
 
 #include "userinfo.h"
 #include "utils.h"
@@ -223,4 +227,72 @@ std::string UserInfo::GetSecret() const
 std::string UserInfo::GetUserId() const
 {
 	return UserId;
+}
+
+//----------------------------------------------------------------------------
+// Summary: Generate QR code for user
+// Params:
+//	outputFileName - name of the file to write the QR code to.
+// Returns: none
+void UserInfo::GetQrCode(std::string outputFileName) const
+{
+	std::string url = GetUrl();
+
+	QRcode *qrCode = QRcode_encodeString(url.c_str(), 0, QR_ECLEVEL_L, QR_MODE_8, 1);
+	if (qrCode == NULL) {
+		throw OtpError(OtpError::ErrorCodes::QrEncodeStringFail, errno);
+	}
+
+	FILE *outfile;
+	gdImagePtr image;
+	int white, black;
+	
+	image = gdImageCreate((2 + qrCode->width) * QrPixelSize, (2 + qrCode->width) * QrPixelSize);
+	white = gdImageColorAllocate(image, 255, 255, 255);	
+	black = gdImageColorAllocate(image, 0, 0, 0);
+
+	for (int i = 0; i < qrCode->width + 2; i++) {
+		SetPixel(image, 0, i, white);
+	}
+	for (int i = 0; i < qrCode->width * qrCode->width; i++) {
+		int row = 1 + (i / qrCode->width);
+		int col = 1 + (i % qrCode->width);
+		int color = (qrCode->data[i] & 1) == 1 ? black : white;
+
+		if (col == 1) {
+			SetPixel(image, 0, row, white);
+		}
+		SetPixel(image, row, col, color);
+		if (col == qrCode->width) {
+			SetPixel(image, 0, 1 + col, white);
+		}
+	}
+	for (int i = 0; i < qrCode->width + 2; i++) {
+		SetPixel(image, 2 + qrCode->width, i, white);
+	}
+
+	outfile = fopen(outputFileName.c_str(), "wb");
+	gdImagePng(image, outfile);
+	fclose(outfile);
+	gdImageDestroy(image);
+}
+
+//----------------------------------------------------------------------------
+// Summary: Set a colour block in the output image
+// Params:
+//	image - GD image object
+//	row - which row to set the block
+//	col - which col to set the block
+//	colour - colour to set the block to
+// Returns: none
+void UserInfo::SetPixel(gdImagePtr image, int row, int col, int colour) const
+{
+	int colStart = col * QrPixelSize;
+	int rowStart = row * QrPixelSize;
+
+	for (int x = 0; x < QrPixelSize; x++) {
+		for (int y = 0; y < QrPixelSize; y++) {
+			gdImageSetPixel(image, colStart + x, rowStart + y, colour);
+		}
+	}
 }
