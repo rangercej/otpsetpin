@@ -28,6 +28,9 @@ extern "C" {
 #include <sys/stat.h>
 }
 
+#include <qrencode.h>
+#include <gd.h>
+
 #include "userinfo.h"
 #include "utils.h"
 #include "options.h"
@@ -224,4 +227,37 @@ std::string UserInfo::GetSecret() const
 std::string UserInfo::GetUserId() const
 {
 	return UserId;
+}
+
+std::string UserInfo::GetQrCode() const
+{
+	std::string url = GetUrl();
+
+	QRcode *qrCode = QRcode_encodeString(url.c_str(), 0, QR_ECLEVEL_H, QR_MODE_AN, 1);
+
+	FILE *outfile;
+	gdImagePtr image;
+	int white, black;
+	int qrPixelSize = 4;
+	
+	image = gdImageCreate(qrCode->width * qrPixelSize, qrCode->width * qrPixelSize);
+	white = gdImageColorAllocate(image, 255, 255, 255);	
+	black = gdImageColorAllocate(image, 0, 0, 0);
+
+	for (int i = 0; i < qrCode->width * qrCode->width; i++) {
+		int row = (i / qrCode->width) * qrPixelSize;
+		int col = (i % qrCode->width) * qrPixelSize;
+
+		int color = (qrCode->data[i] & 1) == 1 ? white : black;
+		for (int x = 0; x < qrPixelSize; x++) {
+			for (int y = 0; y < qrPixelSize; y++) {
+				gdImageSetPixel(image, col + x, row + y, color);
+			}
+		}
+	}
+
+	outfile = fopen("qr.png", "wb");
+	gdImagePng(image, outfile);
+	fclose(outfile);
+	gdImageDestroy(image);
 }

@@ -19,46 +19,59 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
-#ifndef __OTP_USERINFO_H_
-#define __OTP_USERINFO_H_
 
+#include <iostream>
+#include <sstream>
+#include <vector>
+
+#include <cstdlib>
+
+extern "C" {
+	#include <unistd.h>
+	#include <pwd.h>
+}
+
+#include "utils.h"
 #include "options.h"
+#include "userinfo.h"
+#include "otperror.h"
 
-class UserInfo {
+Options options;
 
-	private:
-		struct UserAction {
-			enum Actions { Create, Update, Delete };
-		};
+//----------------------------------------------------------------------------
+// Summary: Program entry point
+// Params:
+//     argc - Count of command line parameters
+//     argv - Command line parameters
+// Returns: program exit code
+int main(int argc, char **argv)
+{
+	std::vector<std::string> args = Utils::mkArgs(argc, argv);
 
-		std::string AuthFileName;
-		Options OtpOptions;
+	std::string user;
+	try {
+		options.ReadOptions();
 
-		std::string UserId;
-		std::string PinNumber;
-		std::string Mode;
-		std::string SharedSecret;
+		if (args.size() > 1) {
+			user = Utils::getUser(args[1]);
+		} else {
+			user = Utils::getCurrentUser();
+		}
 
-		void UpdateUserFile(int userAction);
+		UserInfo userinfo(user, options);
+	
+		if (!Utils::runningAsRoot()) {
+			if (!Utils::validateUserPin(userinfo)) {
+				throw OtpError(OtpError::ErrorCodes::IncorrectPin);
+			}
+		}
 
-		void Get();
+		userinfo.GetQrCode();
+	}
+	catch (OtpError err) {
+		std::cerr << err.GetMessage() << std::endl;
+		return err.GetErrorCode();
+	}
 
-	public:
-		UserInfo(const std::string & userId, const Options & options);
-		void Update();
-		void Create();
-		void Delete();
-
-		UserInfo & SetPinNumber(const std::string &);
-		UserInfo & SetMode(const std::string &);
-		UserInfo & SetSecret(const std::string &);
-
-		std::string GetPinNumber() const;
-		std::string GetMode() const;
-		std::string GetSecret() const;
-		std::string GetUserId() const;
-		std::string GetUrl() const;
-		std::string GetQrCode() const;
-};
-
-#endif
+	return 0;
+}
