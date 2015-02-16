@@ -49,7 +49,8 @@ class OtpError
 				ConfBadOtpLength,
 				ConfUnknownDirective,
 				ConfNotInit,
-				BadSecret
+				BadSecret,
+				QrEncodeStringFail
 			};
 		};
 

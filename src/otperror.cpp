@@ -97,6 +97,9 @@ std::string OtpError::GetMessage() const
 		case ErrorCodes::BadSecret:
 			errorText <<  "Invalid secret supplied";
 			break;
+		case ErrorCodes::QrEncodeStringFail:
+			errorText <<  "Failed to encode URL for QR";
+			break;
 		default:
 			errorText <<  "Unknown error:" << ErrorType;
 	}
