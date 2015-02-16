@@ -238,7 +238,7 @@ void UserInfo::GetQrCode(std::string outputFileName) const
 {
 	std::string url = GetUrl();
 
-	QRcode *qrCode = QRcode_encodeString(url.c_str(), 0, QR_ECLEVEL_L, QR_MODE_8, 1);
+	QRcode *qrCode = QRcode_encodeString(url.c_str(), 0, QR_ECLEVEL_Q, QR_MODE_8, 1);
 	if (qrCode == NULL) {
 		throw OtpError(OtpError::ErrorCodes::QrEncodeStringFail, errno);
 	}
@@ -260,11 +260,11 @@ void UserInfo::GetQrCode(std::string outputFileName) const
 		int color = (qrCode->data[i] & 1) == 1 ? black : white;
 
 		if (col == 1) {
-			SetPixel(image, 0, row, white);
+			SetPixel(image, row, 0, white);
 		}
 		SetPixel(image, row, col, color);
 		if (col == qrCode->width) {
-			SetPixel(image, 0, 1 + col, white);
+			SetPixel(image, row, 1 + col, white);
 		}
 	}
 	for (int i = 0; i < qrCode->width + 2; i++) {
