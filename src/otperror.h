@@ -39,6 +39,7 @@ class OtpError
 				PinMismatch,
 				AuthFileReadError,
 				AuthFileWriteError,
+				AuthFilePermsError,
 				UserWriteError,
 				IncorrectPin,
 				UnknownUser,
@@ -47,7 +48,11 @@ class OtpError
 				CannotDetermineUser,
 				ConfBadOtpLength,
 				ConfUnknownDirective,
-				ConfNotInit
+				ConfNotInit,
+				BadSecret,
+				QrEncodeStringFail,
+				PermsFetchError,
+				FilePermsError,
 			};
 		};
 

@@ -22,6 +22,7 @@ THE SOFTWARE.
 #ifndef __OTP_USERINFO_H_
 #define __OTP_USERINFO_H_
 
+#include <gd.h>
 #include "options.h"
 
 class UserInfo {
@@ -31,15 +32,18 @@ class UserInfo {
 			enum Actions { Create, Update, Delete };
 		};
 
+		static const int QrPixelSize = 4;
+
 		std::string AuthFileName;
 		Options OtpOptions;
 
 		std::string UserId;
 		std::string PinNumber;
 		std::string Mode;
-		std::string Secret;
+		std::string SharedSecret;
 
 		void UpdateUserFile(int userAction);
+		void SetPixel (gdImagePtr, int col, int row, int colour) const;
 
 		void Get();
 
@@ -58,6 +62,7 @@ class UserInfo {
 		std::string GetSecret() const;
 		std::string GetUserId() const;
 		std::string GetUrl() const;
+		void GetQrCode(std::string outputFileName) const;
 };
 
 #endif

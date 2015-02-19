@@ -34,20 +34,10 @@ extern "C" {
 
 #include "utils.h"
 #include "options.h"
+#include "secret.h"
 #include "otperror.h"
 
 Options options;
-
-//----------------------------------------------------------------------------
-// Summary: Get a secret for a user
-// Params: none
-// Returns: The secret to use
-void getSecret(char *target)
-{
-	char *p = (char*)target;
-	std::fstream randomStream("/dev/urandom");
-	randomStream.read(p, SECRETLENGTH);
-}
 
 //----------------------------------------------------------------------------
 // Summary: Program entry point
@@ -71,6 +61,11 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	if (!Utils::isUserKnownToSystem(newuser)) {
+		std::cout << "User not known." << std::endl;
+		return 2;
+	}
+
 	try {
 		options.ReadOptions();
 
@@ -78,12 +73,9 @@ int main(int argc, char **argv)
 		prompt << "Enter PIN for new user " << newuser;
 		std::string password = Utils::getPassword(prompt.str());
 
-		char secretbytes[64];
-		getSecret(secretbytes);
-		std::string secret = Utils::toHex(secretbytes);
-
+		Secret secret;
 		UserInfo userinfo(newuser, options);
-		userinfo.SetMode("HOTP/T30").SetPinNumber(password).SetSecret(secret);
+		userinfo.SetMode("HOTP/T30").SetPinNumber(password).SetSecret(secret.ToHexString());
 		userinfo.Create();
 
 		// See https://code.google.com/p/google-authenticator/wiki/KeyUriFormat for URL format

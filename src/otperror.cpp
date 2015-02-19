@@ -64,6 +64,9 @@ std::string OtpError::GetMessage() const
 		case ErrorCodes::AuthFileWriteError:
 			errorText <<  "Could not open auth file for writing";
 			break;
+		case ErrorCodes::AuthFilePermsError:
+			errorText <<  "Failed to set permissions for auth file";
+			break;
 		case ErrorCodes::UserWriteError:
 			errorText <<  "Unexpected failure to update auth file for user";
 			break;
@@ -90,6 +93,12 @@ std::string OtpError::GetMessage() const
 			break;
 		case ErrorCodes::ConfNotInit:
 			errorText <<  "Configuration has not been initialized";
+			break;
+		case ErrorCodes::BadSecret:
+			errorText <<  "Invalid secret supplied";
+			break;
+		case ErrorCodes::QrEncodeStringFail:
+			errorText <<  "Failed to encode URL for QR";
 			break;
 		default:
 			errorText <<  "Unknown error:" << ErrorType;
