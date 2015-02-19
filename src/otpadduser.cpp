@@ -61,6 +61,11 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
+	if (!Utils::isUserKnownToSystem(newuser)) {
+		std::cout << "User not known." << std::endl;
+		return 2;
+	}
+
 	try {
 		options.ReadOptions();
 

@@ -66,7 +66,12 @@ int main(int argc, char **argv)
 			}
 		}
 
-		userinfo.GetQrCode("qr.png");
+		std::string target("otp-qrcode-");
+		target += user;
+		target += ".png";
+
+		userinfo.GetQrCode(target);
+		std::cout << "QR written to " << target << std::endl;
 	}
 	catch (OtpError err) {
 		std::cerr << err.GetMessage() << std::endl;
