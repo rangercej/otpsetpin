@@ -5,13 +5,17 @@ Userland tools to support pam_oath (http://www.nongnu.org/oath-toolkit/pam_oath.
 Requires:
 	pam_oath
 	liboath
+	libqrencode
+	libgd
 	g++
 	gccmakedep
 
 For building, then on Debian, apt-get install:
-	liboath-dev   (Development header and OATH toolkit library)
-	g++           (C++ compiler)
-	xutils-dev    (For gccmakedep)
+	liboath-dev     (Development header and OATH toolkit library)
+	libqrencode-dev (QR generation library)
+	libgd-dev       (Graphics library; used to create PNG from libqrencode)
+	g++             (C++ compiler)
+	xutils-dev      (For gccmakedep)
 
 For using, then on Debian, apt-get install:
 	libpam-oath   (PAM authentication module)
@@ -31,11 +35,20 @@ QuickStart/Overview
 ===================
 
 Userland utils:
-	otpsetpin - intended to be setuid root, a utility to allow users
+	otpsetpin - intended to be setgid, a utility to allow users
 		to change their OTP pin
+
+	otpgenurl - intended to be setgid, a utility to allow users
+		to re-fetch their otpauth:// URL.
+
+	otpgenqr - intended to be setgid, a utility to allow users
+		to generate a QR code for themselves.
 
 	otpadduser - intended to be ran by root, create an OTP entry for
 		the user so they can log in using OTP.
+
+	otpdeluser - intended to be ran by root, remove an OTP entry for
+		the user, disabling OTP for them.
 
 User configuration is in /etc/users.oath. This file should be root read-only
 as it contains plaintext PIN and secret.

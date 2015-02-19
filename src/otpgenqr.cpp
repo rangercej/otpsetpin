@@ -20,28 +20,63 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 *****************************************************************************/
 
-#ifndef __OTP_UTILS_H_
-#define __OTP_UTILS_H_
-
+#include <iostream>
+#include <sstream>
 #include <vector>
+
+#include <cstdlib>
+
+extern "C" {
+	#include <unistd.h>
+	#include <pwd.h>
+}
+
+#include "utils.h"
 #include "options.h"
 #include "userinfo.h"
+#include "otperror.h"
 
-#define SECRETLENGTH	32
+Options options;
 
-class Utils
+//----------------------------------------------------------------------------
+// Summary: Program entry point
+// Params:
+//     argc - Count of command line parameters
+//     argv - Command line parameters
+// Returns: program exit code
+int main(int argc, char **argv)
 {
-	public:
-		Utils();
+	std::vector<std::string> args = Utils::mkArgs(argc, argv);
 
-		static bool runningAsRoot();
-		static std::vector<std::string> mkArgs (int argc, char **argv);
-		static std::string getPassword(const std::string & prompt);
-		static bool validateUserPin(const UserInfo & user);
-		static bool isUserKnownToSystem(const std::string & username);
-		static std::string getUser(const std::string & user);
-		static std::string getCurrentUser();
-		static std::string getHostName();
-};
+	std::string user;
+	try {
+		options.ReadOptions();
 
-#endif
+		if (args.size() > 1) {
+			user = Utils::getUser(args[1]);
+		} else {
+			user = Utils::getCurrentUser();
+		}
+
+		UserInfo userinfo(user, options);
+	
+		if (!Utils::runningAsRoot()) {
+			if (!Utils::validateUserPin(userinfo)) {
+				throw OtpError(OtpError::ErrorCodes::IncorrectPin);
+			}
+		}
+
+		std::string target("otp-qrcode-");
+		target += user;
+		target += ".png";
+
+		userinfo.GetQrCode(target);
+		std::cout << "QR written to " << target << std::endl;
+	}
+	catch (OtpError err) {
+		std::cerr << err.GetMessage() << std::endl;
+		return err.GetErrorCode();
+	}
+
+	return 0;
+}

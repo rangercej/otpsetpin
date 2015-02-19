@@ -143,51 +143,6 @@ std::string Utils::getCurrentUser()
 }
 
 //----------------------------------------------------------------------------
-// Summary: Convert bytes to a hex string
-// Params: Secret to convert
-// Returns: Hex version of the secret
-std::string Utils::toHex(const char *secret)
-{
-	char hexBuffer[1024];
-	oath_bin2hex(secret, SECRETLENGTH, hexBuffer);
-
-	return std::string(hexBuffer);
-}
-
-//----------------------------------------------------------------------------
-// Summary: Convert bytes to a base32 string
-// Params: Secret to convert as a hex string
-// Returns: Base32 version of the secret
-std::string Utils::toBase32(const char *secret)
-{
-	char *b32Buffer;
-	size_t b32Length;
-	oath_base32_encode(secret, SECRETLENGTH, &b32Buffer, &b32Length);
-
-	std::string b32Secret(b32Buffer);
-	::free(b32Buffer);
-
-	return b32Secret;
-}
-
-//----------------------------------------------------------------------------
-// Summary: Convert hexstring to a base32 string
-// Params: Hex string to convert
-// Returns: Base32 version of the string
-std::string Utils::hexToBase32(const std::string & hexString)
-{
-	char bytes[128];
-	size_t byteLen = sizeof(bytes);
-	int ok = oath_hex2bin (hexString.c_str(), bytes, &byteLen);
-
-	if (ok != OATH_OK) {
-		throw OtpError(OtpError::ErrorCodes::ConversionError, ok);
-	}
-
-	return toBase32(bytes);
-}
-
-//----------------------------------------------------------------------------
 // Summary: Get the computer name
 // Params: none
 // Returns: computer name, or UNKNOWN on error
