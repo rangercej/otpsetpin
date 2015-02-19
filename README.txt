@@ -35,14 +35,14 @@ QuickStart/Overview
 ===================
 
 Userland utils:
-	otpsetpin - intended to be setuid root, a utility to allow users
+	otpsetpin - intended to be setgid, a utility to allow users
 		to change their OTP pin
 
-	otpgenurl - intended to be setuid root, a utility to allow users
+	otpgenurl - intended to be setgid, a utility to allow users
 		to re-fetch their otpauth:// URL.
 
-	otpgenqr - intended to be setuid root, a utility to allow users
-		to generate a QR code
+	otpgenqr - intended to be setgid, a utility to allow users
+		to generate a QR code for themselves.
 
 	otpadduser - intended to be ran by root, create an OTP entry for
 		the user so they can log in using OTP.
