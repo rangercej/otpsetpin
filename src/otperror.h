@@ -50,7 +50,9 @@ class OtpError
 				ConfUnknownDirective,
 				ConfNotInit,
 				BadSecret,
-				QrEncodeStringFail
+				QrEncodeStringFail,
+				PermsFetchError,
+				FilePermsError,
 			};
 		};
 

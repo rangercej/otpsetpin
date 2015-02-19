@@ -27,6 +27,7 @@ THE SOFTWARE.
 
 extern "C" {
 #include <sys/stat.h>
+#include <unistd.h>
 }
 
 #include <qrencode.h>
@@ -144,7 +145,23 @@ void UserInfo::UpdateUserFile(int userAction)
 	if (!userwrote) {
 		throw OtpError(OtpError::ErrorCodes::UserWriteError, UserId);
 	} else {
-		::rename(tempFile.c_str(), AuthFileName.c_str());
+		struct stat fileInfo;
+		int ok = lstat(AuthFileName.c_str(), &fileInfo);
+		if (ok != 0) {
+			throw OtpError(OtpError::ErrorCodes::PermsFetchError, errno);
+		}
+
+		ok = ::chmod(tempFile.c_str(), fileInfo.st_mode);
+		if (ok == 0) {
+			ok = ::chown(tempFile.c_str(), fileInfo.st_uid, fileInfo.st_gid);
+			if (ok == 0) {
+				ok = ::rename(tempFile.c_str(), AuthFileName.c_str());
+			}
+		}
+
+		if (ok != 0) {
+			throw OtpError(OtpError::ErrorCodes::FilePermsError, errno);
+		}
 	}
 }
 
